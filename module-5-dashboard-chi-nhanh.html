@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 7 — Dashboard chi nhánh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="module-style.css">
+<style>:root{--accent:#6d6d74;--accent-soft:rgba(109,109,116,.22);--accent-ink:#bcbcc2}</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="btn" href="so-do-crm-actor-v2.html">← Sơ đồ tổng</a>
+  <span class="btn acc">Module 5 / 5</span>
+  <span class="sp"></span>
+  <button class="btn" onclick="window.print()">⤓ In / PDF</button>
+  <a class="btn" href="module-4-chot-deal.html">← Trước</a>
+</div>
+
+<div class="wrap">
+
+  <!-- ===================== ĐẦU TRANG ===================== -->
+  <div class="hero">
+    <span class="badge">Actor: Sales Manager</span>
+    <h1>Dashboard chi nhánh</h1>
+    <p class="lead" data-ph="Mô tả ngắn 2–3 dòng về module này…"></p>
+  </div>
+
+  <div class="meta">
+    <div><b>Actor chính</b><span data-ph="…"></span></div>
+    <div><b>Actor phụ</b><span data-ph="…"></span></div>
+    <div><b>Đầu vào</b><span data-ph="…"></span></div>
+    <div><b>Đầu ra</b><span data-ph="…"></span></div>
+    <div><b>Kênh / hệ thống liên quan</b><span data-ph="…"></span></div>
+    <div><b>Module liên quan</b><span data-ph="…"></span></div>
+  </div>
+
+  <!-- ===================== MỤC TIÊU ===================== -->
+  <section>
+    <h2>Mục tiêu module</h2>
+    <p class="desc" data-ph="Một câu dẫn cho phần mục tiêu (có thể xóa dòng này)…"></p>
+    <ul class="list">
+      <li data-ph="Mục tiêu 1…"></li>
+      <li data-ph="Mục tiêu 2…"></li>
+      <li data-ph="Mục tiêu 3…"></li>
+    </ul>
+  </section>
+
+  <!-- ===================== LUỒNG NGHIỆP VỤ ===================== -->
+  <section>
+    <h2>Luồng nghiệp vụ chính</h2>
+    <ol class="flow">
+      <li data-ph="Bước 1…"></li>
+      <li data-ph="Bước 2…"></li>
+      <li data-ph="Bước 3…"></li>
+      <li data-ph="Bước 4…"></li>
+      <li data-ph="Bước 5…"></li>
+    </ol>
+  </section>
+
+  <!-- ===================== YÊU CẦU BẮT BUỘC ===================== -->
+  <section id="must">
+    <h2>Yêu cầu bắt buộc</h2>
+    <p class="desc" data-ph="Ghi chú cho nhóm yêu cầu bắt buộc (có thể xóa dòng này)…"></p>
+    <div class="reqs">
+
+      <!-- Sao chép nguyên khối <div class="req"> bên dưới để thêm yêu cầu mới -->
+      <div class="req">
+        <div class="rh"><span class="code" data-ph="DB-M01"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req">
+        <div class="rh"><span class="code" data-ph="DB-M02"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req">
+        <div class="rh"><span class="code" data-ph="DB-M03"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req">
+        <div class="rh"><span class="code" data-ph="DB-M04"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req">
+        <div class="rh"><span class="code" data-ph="DB-M05"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== YÊU CẦU KHÔNG BẮT BUỘC ===================== -->
+  <section id="opt">
+    <h2>Yêu cầu không bắt buộc</h2>
+    <p class="desc" data-ph="Ghi chú cho nhóm yêu cầu không bắt buộc (có thể xóa dòng này)…"></p>
+    <div class="reqs">
+
+      <div class="req opt">
+        <div class="rh"><span class="code" data-ph="DB-O01"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Nên có"></span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req opt">
+        <div class="rh"><span class="code" data-ph="DB-O02"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Nên có"></span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req opt">
+        <div class="rh"><span class="code" data-ph="DB-O03"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Có thể có"></span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req opt">
+        <div class="rh"><span class="code" data-ph="DB-O04"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Có thể có"></span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== DỮ LIỆU ===================== -->
+  <section>
+    <h2>Dữ liệu chính</h2>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Chỉ số / Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== TIÊU CHÍ CHẤP NHẬN ===================== -->
+  <section>
+    <h2>Tiêu chí chấp nhận &amp; chỉ số đo</h2>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Tiêu chí</th><th>Ngưỡng mục tiêu</th></tr>
+        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== GHI CHÚ DIỄN GIẢI ===================== -->
+  <section>
+    <h2>Ghi chú khi diễn giải</h2>
+    <div class="callout">
+      <h3 data-ph="Tiêu đề ghi chú…"></h3>
+      <ul>
+        <li data-ph="Ý cần nhấn 1…"></li>
+        <li data-ph="Ý cần nhấn 2…"></li>
+        <li data-ph="Ý cần nhấn 3…"></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="nav">
+    <a class="btn" href="module-4-chot-deal.html">← Module 4 · Chốt deal</a>
+    <a class="btn acc" href="so-do-crm-actor-v2.html">Về sơ đồ tổng →</a>
+  </div>
+
+</div>
+</body>
+</html>

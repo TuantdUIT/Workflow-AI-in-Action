@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module 3 — Tư vấn · báo giá</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="module-style.css">
+<style>
+  :root{--accent:#1a916c;--accent-soft:rgba(26,145,108,.15);--accent-ink:#74dcae}
+  .tbl-scroll{text-align:center}
+  .tbl-scroll svg{display:inline-block;margin:0 auto}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a class="btn" href="so-do-crm-actor-v2.html">← Sơ đồ tổng</a>
+  <span class="btn acc">Module 3 / 5</span>
+  <span class="sp"></span>
+  <button class="btn" onclick="window.print()">⤓ In / PDF</button>
+  <a class="btn" href="module-2-marketing-automation.html">← Trước</a>
+  <a class="btn" href="module-4-chot-deal.html">Sau →</a>
+</div>
+
+<div class="wrap">
+
+  <!-- ===================== ĐẦU TRANG ===================== -->
+  <div class="hero">
+    <span class="badge">Actor: Sales &amp; Customer</span>
+    <h1>Tư vấn · báo giá</h1>
+    <p class="lead">Sales phối hợp cùng hệ thống AI (RAG tra cứu thông tin sản phẩm + thông tin ngân sách của khách hàng) để tư vấn và báo giá phù hợp với nhu cầu từng khách hàng, giúp khách hiểu rõ sản phẩm và tiến tới quyết định mua xe.</p>
+  </div>
+
+  <div class="meta">
+    <div><b>Actor chính</b><span>Sales, Khách hàng</span></div>
+    <div><b>Actor phụ</b><span>Hệ thống RAG hỗ trợ tra cứu thông tin; phân tích dữ liệu tin nhắn khách hàng gửi</span></div>
+    <div><b>Đầu vào</b><span>Thông tin khách hàng hỏi mua xe</span></div>
+    <div><b>Đầu ra</b><span>Khách hàng có quyết định mua xe hay không</span></div>
+    <div><b>Kênh / hệ thống liên quan</b><span data-ph="…"></span></div>
+    <div><b>Module kế tiếp</b><span>Chốt deal</span></div>
+  </div>
+
+  <!-- ===================== MỤC TIÊU ===================== -->
+  <section>
+    <h2>Mục tiêu module</h2>
+    <ul class="list">
+      <li>Giúp khách hàng hiểu về sản phẩm mà cửa hàng đem lại</li>
+      <li>Chốt deal, tăng doanh thu cho cửa hàng</li>
+    </ul>
+  </section>
+
+  <!-- ===================== LUỒNG NGHIỆP VỤ ===================== -->
+  <section>
+    <h2>Luồng nghiệp vụ chính</h2>
+    <div class="tbl-scroll">
+      <pre class="mermaid">
+flowchart TD
+    A(["Khách hàng đặt câu hỏi về xe<br/>(chat / Zalo / hotline)"]) --> B["Hệ thống RAG tra cứu thông tin sản phẩm<br/>(specs, giá, khuyến mãi)"]
+    B --> C["Phân tích dữ liệu khách hàng gửi qua tin nhắn<br/>(nhu cầu, ngân sách, hình ảnh...) để tư vấn"]
+    C --> D["Sales tổng hợp, tư vấn &amp; báo giá phù hợp"]
+    D --> E{"Khách có quyết định mua xe không?"}
+    E -->|Có| F(["Chuyển sang Chốt deal"])
+    E -->|Chưa / Không| G["Sales ghi nhận lý do,<br/>lưu lại thông tin trao đổi"]
+    G --> H(["Quay lại Nuôi dưỡng khách hàng"])
+
+    classDef startend fill:#1a916c,stroke:#74dcae,color:#0d0d0f,font-weight:600,stroke-width:2px;
+    classDef decision fill:#1a1a20,stroke:#e0954a,color:#f2f2f4,stroke-width:2px;
+    classDef step fill:#141419,stroke:#282830,color:#f2f2f4;
+    class A,F,H startend
+    class E decision
+    class B,C,D,G step
+      </pre>
+    </div>
+  </section>
+
+  <!-- ===================== YÊU CẦU BẮT BUỘC ===================== -->
+  <section id="must">
+    <h2>Yêu cầu bắt buộc</h2>
+    <p class="desc" data-ph="Ghi chú cho nhóm yêu cầu bắt buộc (có thể xóa dòng này)…"></p>
+    <div class="reqs">
+
+      <!-- Sao chép nguyên khối <div class="req"> bên dưới để thêm yêu cầu mới -->
+      <div class="req">
+        <div class="rh"><span class="code" data-ph="BG-M01"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req">
+        <div class="rh"><span class="code" data-ph="BG-M02"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req">
+        <div class="rh"><span class="code" data-ph="BG-M03"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req">
+        <div class="rh"><span class="code" data-ph="BG-M04"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req">
+        <div class="rh"><span class="code" data-ph="BG-M05"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== YÊU CẦU KHÔNG BẮT BUỘC ===================== -->
+  <section id="opt">
+    <h2>Yêu cầu không bắt buộc</h2>
+    <p class="desc" data-ph="Ghi chú cho nhóm yêu cầu không bắt buộc (có thể xóa dòng này)…"></p>
+    <div class="reqs">
+
+      <div class="req opt">
+        <div class="rh"><span class="code" data-ph="BG-O01"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Nên có"></span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req opt">
+        <div class="rh"><span class="code" data-ph="BG-O02"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Nên có"></span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req opt">
+        <div class="rh"><span class="code" data-ph="BG-O03"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Có thể có"></span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+      <div class="req opt">
+        <div class="rh"><span class="code" data-ph="BG-O04"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Có thể có"></span></div>
+        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== DỮ LIỆU ===================== -->
+  <section>
+    <h2>Dữ liệu chính</h2>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== TIÊU CHÍ CHẤP NHẬN ===================== -->
+  <section>
+    <h2>Tiêu chí chấp nhận &amp; chỉ số đo</h2>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Tiêu chí</th><th>Ngưỡng mục tiêu</th></tr>
+        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== GHI CHÚ DIỄN GIẢI ===================== -->
+  <section>
+    <h2>Ghi chú khi diễn giải</h2>
+    <div class="callout">
+      <h3 data-ph="Tiêu đề ghi chú…"></h3>
+      <ul>
+        <li data-ph="Ý cần nhấn 1…"></li>
+        <li data-ph="Ý cần nhấn 2…"></li>
+        <li data-ph="Ý cần nhấn 3…"></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="nav">
+    <a class="btn" href="module-2-marketing-automation.html">← Module 2 · Marketing Automation</a>
+    <a class="btn acc" href="module-4-chot-deal.html">Module 4 · Chốt deal →</a>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    themeVariables: {
+      background: '#0d0d0f',
+      primaryColor: '#141419',
+      primaryTextColor: '#f2f2f4',
+      primaryBorderColor: '#282830',
+      lineColor: '#6f757d',
+      secondaryColor: '#1a1a20',
+      tertiaryColor: '#101014',
+      edgeLabelBackground: '#141419',
+      fontSize: '14px'
+    },
+    flowchart: { curve: 'basis' }
+  });
+</script>
+</body>
+</html>
