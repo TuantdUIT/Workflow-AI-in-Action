@@ -66,12 +66,12 @@ flowchart TD
     B -->|Có| C["Khách đặt cọc<br/>(chuyển khoản / POS tại showroom)"]
     C --> D["Sales soạn hợp đồng mua bán,<br/>gửi khách xem trước"]
     D --> E["Khách ký hợp đồng<br/>(điện tử hoặc trực tiếp tại showroom)"]
-    E --> F["Sales lưu hợp đồng đã ký<br/>vào hồ sơ tài liệu nội bộ"]
+    E --> F["Sales số hóa và lưu hợp đồng đã ký,<br/>gắn với mã đơn hàng"]
     F --> G{"Xe đã có sẵn tại showroom?"}
     G -->|Chưa, chờ kho / nhà máy| H["Sales cập nhật khách<br/>thời gian dự kiến giao xe"]
     H --> G
     G -->|Có| I["Sales lên lịch bàn giao xe"]
-    I --> J["Bàn giao xe: kiểm tra xe, hướng dẫn sử dụng,<br/>hoàn tất giấy tờ đăng ký"]
+    I --> J["Bàn giao xe: hướng dẫn sử dụng,<br/>hoàn tất giấy tờ đăng ký"]
     J --> K["Khách thanh toán số tiền còn lại"]
     K --> L["Sales cập nhật trạng thái đơn hàng:<br/>Đã chốt deal"]
     L --> M(["Dữ liệu đổ về Dashboard chi nhánh"])
@@ -98,14 +98,10 @@ flowchart TD
       </div>
 
       <div class="req">
-        <div class="rh"><span class="code">CD-M02</span><span class="rt">Lưu trữ hợp đồng đã ký vào hồ sơ tài liệu nội bộ</span><span class="tag">Bắt buộc</span></div>
-        <p class="rd">Mọi hợp đồng sau khi khách ký (điện tử hoặc bản giấy scan) phải được số hóa và lưu vào kho tài liệu nội bộ, gắn với đúng mã khách hàng để tra cứu về sau.</p>
+        <div class="rh"><span class="code">CD-M02</span><span class="rt">Lưu trữ hợp đồng đã ký</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Mọi hợp đồng sau khi khách ký (điện tử hoặc bản giấy scan) phải được số hóa và lưu vào bảng <code>contracts</code>, gắn với đúng mã đơn hàng để tra cứu và đối soát về sau.</p>
       </div>
 
-      <div class="req">
-        <div class="rh"><span class="code">CD-M03</span><span class="rt">Kiểm tra tình trạng xe trước khi hẹn lịch bàn giao</span><span class="tag">Bắt buộc</span></div>
-        <p class="rd">Sales phải xác nhận xe đã có sẵn tại showroom, hoặc đã có ngày dự kiến từ kho/nhà máy, trước khi hẹn lịch bàn giao với khách để tránh trễ hẹn.</p>
-      </div>
 
       <div class="req">
         <div class="rh"><span class="code">CD-M04</span><span class="rt">Checklist bàn giao đầy đủ trước khi xác nhận hoàn tất</span><span class="tag">Bắt buộc</span></div>
@@ -154,19 +150,29 @@ flowchart TD
     <div class="tbl-scroll">
       <table>
         <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
-        <tr><td><code>Mã đơn hàng</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh duy nhất cho mỗi đơn hàng/hợp đồng</td></tr>
-        <tr><td><code>Khách hàng</code></td><td>Liên kết → hồ sơ khách hàng</td><td>Có</td><td>Khách hàng đã đồng ý mua, chuyển từ module Tư vấn · báo giá</td></tr>
-        <tr><td><code>Mẫu xe đã chốt</code></td><td>Text</td><td>Có</td><td>Model xe khách quyết định mua</td></tr>
-        <tr><td><code>Showroom xử lý</code></td><td>Liên kết → <code>SHOWROOM.Mã showroom</code></td><td>Có</td><td>Showroom thực hiện giao dịch và bàn giao xe</td></tr>
-        <tr><td><code>Sales phụ trách</code></td><td>Text</td><td>Có</td><td>Người chốt deal, dùng để tính doanh số/hoa hồng</td></tr>
-        <tr><td><code>Số tiền đặt cọc</code></td><td>Số</td><td>Có (sau khi cọc)</td><td>Ghi nhận khi khách hoàn tất đặt cọc</td></tr>
-        <tr><td><code>Ngày đặt cọc</code></td><td>Ngày giờ</td><td>Có (sau khi cọc)</td><td>Thời điểm hệ thống xác nhận đã nhận cọc</td></tr>
-        <tr><td><code>Ngày ký hợp đồng</code></td><td>Ngày giờ</td><td>Có (sau khi ký)</td><td>Thời điểm khách ký hợp đồng mua bán</td></tr>
-        <tr><td><code>File hợp đồng</code></td><td>Liên kết → hồ sơ tài liệu nội bộ</td><td>Có (sau khi ký)</td><td>Bản hợp đồng đã ký, lưu trữ để tra cứu và đối soát</td></tr>
-        <tr><td><code>Ngày dự kiến giao xe</code></td><td>Ngày giờ</td><td>Có</td><td>Lấy từ tình trạng tồn kho showroom hoặc kế hoạch nhà máy</td></tr>
-        <tr><td><code>Ngày bàn giao thực tế</code></td><td>Ngày giờ</td><td>Có (sau khi bàn giao)</td><td>Thời điểm hoàn tất checklist bàn giao xe</td></tr>
-        <tr><td><code>Tổng giá trị đơn hàng</code></td><td>Số</td><td>Có</td><td>Bao gồm giá xe và các khoản phụ kiện/bảo hiểm đi kèm (nếu có)</td></tr>
-        <tr><td><code>Trạng thái đơn hàng</code></td><td>Enum</td><td>Có</td><td>Chờ cọc / Đã cọc / Đã ký hợp đồng / Chờ giao xe / Đã chốt deal / Hủy</td></tr>
+        <tr><td><code>Mã đơn hàng</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh duy nhất cho mỗi đơn hàng, dùng luôn làm số hợp đồng</td></tr>
+        <tr><td><code>Mã khách hàng</code></td><td>Liên kết → <code>customers</code></td><td>Có</td><td>Khách hàng đã đồng ý mua, chuyển từ module Tư vấn · báo giá</td></tr>
+        <tr><td><code>Mã nhân viên</code></td><td>Liên kết → <code>employees</code></td><td>Có</td><td>Sales chốt deal, dùng để tính doanh số/hoa hồng (yêu cầu CD-M05)</td></tr>
+        <tr><td><code>Mã showroom</code></td><td>Liên kết → <code>showrooms</code></td><td>Có</td><td>Showroom thực hiện giao dịch — trục lọc chính của Dashboard chi nhánh</td></tr>
+        <tr><td><code>Mã xe</code></td><td>Liên kết → <code>models</code></td><td>Có</td><td>Model xe khách quyết định mua</td></tr>
+        <tr><td><code>Tổng giá trị</code></td><td>Số</td><td>Có</td><td>Giá trị hợp đồng, gồm giá xe và phụ kiện/bảo hiểm đi kèm (nếu có)</td></tr>
+        <tr><td><code>Tiền đặt cọc</code></td><td>Số</td><td>Có</td><td>Đơn hàng chỉ được tạo sau khi khách đã đặt cọc</td></tr>
+        <tr><td><code>Ngày đặt cọc</code></td><td>Ngày giờ</td><td>Có</td><td>Thời điểm hệ thống xác nhận đã nhận cọc — mốc khởi tạo đơn hàng</td></tr>
+        <tr><td><code>Ngày bàn giao</code></td><td>Ngày giờ</td><td>Sau khi bàn giao</td><td>Thời điểm hoàn tất checklist bàn giao (yêu cầu CD-M04)</td></tr>
+        <tr><td><code>Trạng thái</code></td><td>Enum</td><td>Có</td><td>Đã cọc / Đã ký hợp đồng / Đã chốt deal</td></tr>
+      </table>
+    </div>
+
+    <h3 style="margin:26px 0 0"><code>contracts</code> — hợp đồng mua bán</h3>
+    <p class="rd" style="margin:6px 0 12px">Chứng từ pháp lý của từng đơn hàng, tách riêng khỏi <code>internal_documents</code> (kho tài liệu tư vấn dùng chung). Mỗi đơn hàng đã ký sinh đúng một hợp đồng — quan hệ <b>1 – 1</b>.</p>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code>Mã hợp đồng</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh nội bộ của hợp đồng</td></tr>
+        <tr><td><code>Mã đơn hàng</code></td><td>Liên kết → <code>orders</code></td><td>Có</td><td>Đơn hàng mà hợp đồng này thuộc về</td></tr>
+        <tr><td><code>Số hợp đồng</code></td><td>Text</td><td>Có</td><td>Số in trên bản giấy (VD: HD-2026-0001), dùng đối soát với kế toán</td></tr>
+        <tr><td><code>Ngày ký</code></td><td>Ngày giờ</td><td>Có</td><td>Cùng với ngày đặt cọc cho ra chỉ số "cọc → ký ≤ 3 ngày"</td></tr>
+        <tr><td><code>Đường dẫn file</code></td><td>Text</td><td>Có</td><td>Bản hợp đồng đã ký được số hóa (yêu cầu CD-M02)</td></tr>
       </table>
     </div>
   </section>
