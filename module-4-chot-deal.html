@@ -3,12 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 6 — Chốt deal</title>
+<title>Module 4 — Chốt deal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="module-style.css">
-<style>:root{--accent:#1a916c;--accent-soft:rgba(26,145,108,.15);--accent-ink:#74dcae}</style>
+<style>
+  :root{--accent:#1a916c;--accent-soft:rgba(26,145,108,.15);--accent-ink:#74dcae}
+  .tbl-scroll{text-align:center}
+  .tbl-scroll svg{display:inline-block;margin:0 auto}
+</style>
 </head>
 <body>
 
@@ -27,71 +31,90 @@
   <div class="hero">
     <span class="badge">Actor: Sales</span>
     <h1>Chốt deal</h1>
-    <p class="lead" data-ph="Mô tả ngắn 2–3 dòng về module này…"></p>
+    <p class="lead">Sau khi khách hàng đồng ý mua xe ở module Tư vấn · báo giá, Sales chuyển yêu cầu thành đơn hàng chính thức: nhận cọc, soạn và ký hợp đồng, phối hợp bàn giao xe. Đây là module chuyển hóa khách tiềm năng thành doanh thu thực tế, đồng thời là nguồn dữ liệu chính cho Dashboard chi nhánh.</p>
   </div>
 
   <div class="meta">
-    <div><b>Actor chính</b><span data-ph="…"></span></div>
-    <div><b>Actor phụ</b><span data-ph="…"></span></div>
-    <div><b>Đầu vào</b><span data-ph="…"></span></div>
-    <div><b>Đầu ra</b><span data-ph="…"></span></div>
-    <div><b>Kênh / hệ thống liên quan</b><span data-ph="…"></span></div>
-    <div><b>Module kế tiếp</b><span data-ph="…"></span></div>
+    <div><b>Actor chính</b><span>Sales</span></div>
+    <div><b>Actor phụ</b><span>Khách hàng (đặt cọc, ký hợp đồng); Kho / nhà máy (chuẩn bị xe giao)</span></div>
+    <div><b>Đầu vào</b><span>Khách hàng đã đồng ý mua xe (chuyển từ module Tư vấn · báo giá)</span></div>
+    <div><b>Đầu ra</b><span>Hợp đồng đã ký + xe đã bàn giao — đơn hàng ở trạng thái "Đã chốt deal"</span></div>
+    <div><b>Kênh / hệ thống liên quan</b><span>CRM (đơn hàng, hợp đồng); Thanh toán (chuyển khoản / POS tại showroom); Zalo/Telegram (nhắc lịch, gửi hợp đồng)</span></div>
+    <div><b>Module kế tiếp</b><span>Dashboard chi nhánh</span></div>
   </div>
 
   <!-- ===================== MỤC TIÊU ===================== -->
   <section>
     <h2>Mục tiêu module</h2>
-    <p class="desc" data-ph="Một câu dẫn cho phần mục tiêu (có thể xóa dòng này)…"></p>
     <ul class="list">
-      <li data-ph="Mục tiêu 1…"></li>
-      <li data-ph="Mục tiêu 2…"></li>
-      <li data-ph="Mục tiêu 3…"></li>
+      <li>Chuyển khách hàng đã đồng ý mua thành đơn hàng chính thức, có cọc và hợp đồng ràng buộc</li>
+      <li>Đảm bảo trình tự đặt cọc → ký hợp đồng → bàn giao xe diễn ra đúng thứ tự, không thất thoát chứng từ</li>
+      <li>Cung cấp dữ liệu doanh thu và tỉ lệ chốt deal chính xác, kịp thời cho Dashboard chi nhánh</li>
     </ul>
   </section>
 
   <!-- ===================== LUỒNG NGHIỆP VỤ ===================== -->
   <section>
     <h2>Luồng nghiệp vụ chính</h2>
-    <ol class="flow">
-      <li data-ph="Bước 1…"></li>
-      <li data-ph="Bước 2…"></li>
-      <li data-ph="Bước 3…"></li>
-      <li data-ph="Bước 4…"></li>
-      <li data-ph="Bước 5…"></li>
-    </ol>
+    <div class="tbl-scroll">
+      <pre class="mermaid">
+flowchart TD
+    ST(["Khách hàng đồng ý mua xe<br/>(từ Tư vấn · báo giá)"]) --> A["Sales lập đơn hàng &amp; báo giá<br/>chính thức trên CRM"]
+    A --> B{"Khách đồng ý đặt cọc?"}
+    B -->|Không| Z["Sales ghi nhận lý do,<br/>chuyển lại Nuôi dưỡng khách hàng"]
+    Z --> ZZ(["Kết thúc — chưa chốt deal"])
+    B -->|Có| C["Khách đặt cọc<br/>(chuyển khoản / POS tại showroom)"]
+    C --> D["Sales soạn hợp đồng mua bán,<br/>gửi khách xem trước"]
+    D --> E["Khách ký hợp đồng<br/>(điện tử hoặc trực tiếp tại showroom)"]
+    E --> F["Sales lưu hợp đồng đã ký<br/>vào hồ sơ tài liệu nội bộ"]
+    F --> G{"Xe đã có sẵn tại showroom?"}
+    G -->|Chưa, chờ kho / nhà máy| H["Sales cập nhật khách<br/>thời gian dự kiến giao xe"]
+    H --> G
+    G -->|Có| I["Sales lên lịch bàn giao xe"]
+    I --> J["Bàn giao xe: kiểm tra xe, hướng dẫn sử dụng,<br/>hoàn tất giấy tờ đăng ký"]
+    J --> K["Khách thanh toán số tiền còn lại"]
+    K --> L["Sales cập nhật trạng thái đơn hàng:<br/>Đã chốt deal"]
+    L --> M(["Dữ liệu đổ về Dashboard chi nhánh"])
+
+    classDef startend fill:#1a916c,stroke:#74dcae,color:#0d0d0f,font-weight:600,stroke-width:2px;
+    classDef decision fill:#1a1a20,stroke:#e0954a,color:#f2f2f4,stroke-width:2px;
+    classDef step fill:#141419,stroke:#282830,color:#f2f2f4;
+    class ST,M,ZZ startend
+    class B,G decision
+    class A,C,D,E,F,H,I,J,K,L,Z step
+      </pre>
+    </div>
   </section>
 
   <!-- ===================== YÊU CẦU BẮT BUỘC ===================== -->
   <section id="must">
     <h2>Yêu cầu bắt buộc</h2>
-    <p class="desc" data-ph="Ghi chú cho nhóm yêu cầu bắt buộc (có thể xóa dòng này)…"></p>
     <div class="reqs">
 
       <!-- Sao chép nguyên khối <div class="req"> bên dưới để thêm yêu cầu mới -->
       <div class="req">
-        <div class="rh"><span class="code" data-ph="CD-M01"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">CD-M01</span><span class="rt">Xác nhận đặt cọc trước khi soạn hợp đồng</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Sales phải xác nhận đã nhận cọc (số tiền, hình thức thanh toán) trước khi soạn hợp đồng mua bán, tránh trường hợp hợp đồng được gửi khi chưa có cọc.</p>
       </div>
 
       <div class="req">
-        <div class="rh"><span class="code" data-ph="CD-M02"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">CD-M02</span><span class="rt">Lưu trữ hợp đồng đã ký vào hồ sơ tài liệu nội bộ</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Mọi hợp đồng sau khi khách ký (điện tử hoặc bản giấy scan) phải được số hóa và lưu vào kho tài liệu nội bộ, gắn với đúng mã khách hàng để tra cứu về sau.</p>
       </div>
 
       <div class="req">
-        <div class="rh"><span class="code" data-ph="CD-M03"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">CD-M03</span><span class="rt">Kiểm tra tình trạng xe trước khi hẹn lịch bàn giao</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Sales phải xác nhận xe đã có sẵn tại showroom, hoặc đã có ngày dự kiến từ kho/nhà máy, trước khi hẹn lịch bàn giao với khách để tránh trễ hẹn.</p>
       </div>
 
       <div class="req">
-        <div class="rh"><span class="code" data-ph="CD-M04"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">CD-M04</span><span class="rt">Checklist bàn giao đầy đủ trước khi xác nhận hoàn tất</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Buổi bàn giao phải hoàn thành đủ 3 phần: kiểm tra tình trạng xe, hướng dẫn sử dụng, và hoàn tất giấy tờ đăng ký — thì đơn hàng mới được đánh dấu "Đã chốt deal".</p>
       </div>
 
       <div class="req">
-        <div class="rh"><span class="code" data-ph="CD-M05"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">CD-M05</span><span class="rt">Ghi nhận Sales phụ trách chốt deal</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Mỗi đơn hàng phải gắn với đúng Sales đã chốt, làm căn cứ tính doanh số/hoa hồng và hiển thị chính xác trên Dashboard chi nhánh.</p>
       </div>
 
     </div>
@@ -100,27 +123,26 @@
   <!-- ===================== YÊU CẦU KHÔNG BẮT BUỘC ===================== -->
   <section id="opt">
     <h2>Yêu cầu không bắt buộc</h2>
-    <p class="desc" data-ph="Ghi chú cho nhóm yêu cầu không bắt buộc (có thể xóa dòng này)…"></p>
     <div class="reqs">
 
       <div class="req opt">
-        <div class="rh"><span class="code" data-ph="CD-O01"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Nên có"></span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">CD-O01</span><span class="rt">Nhắc thanh toán tự động</span><span class="tag o">Nên có</span></div>
+        <p class="rd">Hệ thống tự động gửi nhắc nhở qua Zalo/SMS cho khách nếu quá thời hạn quy định (ví dụ 3 ngày) mà chưa hoàn tất đặt cọc.</p>
       </div>
 
       <div class="req opt">
-        <div class="rh"><span class="code" data-ph="CD-O02"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Nên có"></span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">CD-O02</span><span class="rt">Hợp đồng điện tử có chữ ký số</span><span class="tag o">Nên có</span></div>
+        <p class="rd">Cho phép khách ký hợp đồng trực tuyến bằng chữ ký điện tử, rút ngắn thời gian chốt deal cho khách ở xa showroom.</p>
       </div>
 
       <div class="req opt">
-        <div class="rh"><span class="code" data-ph="CD-O03"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Có thể có"></span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">CD-O03</span><span class="rt">Gợi ý gói bảo hiểm / phụ kiện đi kèm</span><span class="tag o">Có thể có</span></div>
+        <p class="rd">Khi soạn hợp đồng hoặc bàn giao xe, hệ thống gợi ý Sales chào thêm gói bảo hiểm, phụ kiện phù hợp để tăng giá trị đơn hàng.</p>
       </div>
 
       <div class="req opt">
-        <div class="rh"><span class="code" data-ph="CD-O04"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag o" data-ph="Có thể có"></span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">CD-O04</span><span class="rt">Khảo sát hài lòng sau bàn giao</span><span class="tag o">Có thể có</span></div>
+        <p class="rd">Tự động gửi khảo sát ngắn cho khách ngay sau khi bàn giao xe để đo mức độ hài lòng, dữ liệu phục vụ chăm sóc khách hàng sau bán.</p>
       </div>
 
     </div>
@@ -132,11 +154,19 @@
     <div class="tbl-scroll">
       <table>
         <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td><code>Mã đơn hàng</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh duy nhất cho mỗi đơn hàng/hợp đồng</td></tr>
+        <tr><td><code>Khách hàng</code></td><td>Liên kết → hồ sơ khách hàng</td><td>Có</td><td>Khách hàng đã đồng ý mua, chuyển từ module Tư vấn · báo giá</td></tr>
+        <tr><td><code>Mẫu xe đã chốt</code></td><td>Text</td><td>Có</td><td>Model xe khách quyết định mua</td></tr>
+        <tr><td><code>Showroom xử lý</code></td><td>Liên kết → <code>SHOWROOM.Mã showroom</code></td><td>Có</td><td>Showroom thực hiện giao dịch và bàn giao xe</td></tr>
+        <tr><td><code>Sales phụ trách</code></td><td>Text</td><td>Có</td><td>Người chốt deal, dùng để tính doanh số/hoa hồng</td></tr>
+        <tr><td><code>Số tiền đặt cọc</code></td><td>Số</td><td>Có (sau khi cọc)</td><td>Ghi nhận khi khách hoàn tất đặt cọc</td></tr>
+        <tr><td><code>Ngày đặt cọc</code></td><td>Ngày giờ</td><td>Có (sau khi cọc)</td><td>Thời điểm hệ thống xác nhận đã nhận cọc</td></tr>
+        <tr><td><code>Ngày ký hợp đồng</code></td><td>Ngày giờ</td><td>Có (sau khi ký)</td><td>Thời điểm khách ký hợp đồng mua bán</td></tr>
+        <tr><td><code>File hợp đồng</code></td><td>Liên kết → hồ sơ tài liệu nội bộ</td><td>Có (sau khi ký)</td><td>Bản hợp đồng đã ký, lưu trữ để tra cứu và đối soát</td></tr>
+        <tr><td><code>Ngày dự kiến giao xe</code></td><td>Ngày giờ</td><td>Có</td><td>Lấy từ tình trạng tồn kho showroom hoặc kế hoạch nhà máy</td></tr>
+        <tr><td><code>Ngày bàn giao thực tế</code></td><td>Ngày giờ</td><td>Có (sau khi bàn giao)</td><td>Thời điểm hoàn tất checklist bàn giao xe</td></tr>
+        <tr><td><code>Tổng giá trị đơn hàng</code></td><td>Số</td><td>Có</td><td>Bao gồm giá xe và các khoản phụ kiện/bảo hiểm đi kèm (nếu có)</td></tr>
+        <tr><td><code>Trạng thái đơn hàng</code></td><td>Enum</td><td>Có</td><td>Chờ cọc / Đã cọc / Đã ký hợp đồng / Chờ giao xe / Đã chốt deal / Hủy</td></tr>
       </table>
     </div>
   </section>
@@ -147,10 +177,10 @@
     <div class="tbl-scroll">
       <table>
         <tr><th>Tiêu chí</th><th>Ngưỡng mục tiêu</th></tr>
-        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td>Tỉ lệ chuyển đổi từ báo giá sang đặt cọc</td><td>≥ 40%</td></tr>
+        <tr><td>Thời gian trung bình từ đặt cọc đến ký hợp đồng</td><td>≤ 3 ngày</td></tr>
+        <tr><td>Thời gian trung bình từ ký hợp đồng đến bàn giao xe</td><td>≤ 14 ngày</td></tr>
+        <tr><td>Tỉ lệ đơn hàng có hợp đồng lưu trữ số hóa đầy đủ</td><td>100%</td></tr>
       </table>
     </div>
   </section>
@@ -159,11 +189,11 @@
   <section>
     <h2>Ghi chú khi diễn giải</h2>
     <div class="callout">
-      <h3 data-ph="Tiêu đề ghi chú…"></h3>
+      <h3>Điểm cần lưu ý khi trình bày module này</h3>
       <ul>
-        <li data-ph="Ý cần nhấn 1…"></li>
-        <li data-ph="Ý cần nhấn 2…"></li>
-        <li data-ph="Ý cần nhấn 3…"></li>
+        <li>Điểm bắt đầu là khách đã đồng ý mua xe ở module Tư vấn · báo giá — module này không lặp lại bước tư vấn, chỉ xử lý phần đặt cọc, hợp đồng, bàn giao.</li>
+        <li>Nhánh "khách không đặt cọc" không phải lỗi hệ thống mà là khách đổi ý; hồ sơ được chuyển lại Nuôi dưỡng khách hàng thay vì đóng hẳn.</li>
+        <li>Bàn giao xe chỉ được xem là hoàn tất khi đủ 3 điều kiện: kiểm tra xe, hướng dẫn sử dụng, giấy tờ đăng ký — thiếu một trong ba, đơn hàng vẫn giữ trạng thái "Chờ giao xe".</li>
       </ul>
     </div>
   </section>
@@ -174,5 +204,26 @@
   </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    themeVariables: {
+      background: '#0d0d0f',
+      primaryColor: '#141419',
+      primaryTextColor: '#f2f2f4',
+      primaryBorderColor: '#282830',
+      lineColor: '#6f757d',
+      secondaryColor: '#1a1a20',
+      tertiaryColor: '#101014',
+      edgeLabelBackground: '#141419',
+      fontSize: '14px'
+    },
+    flowchart: { curve: 'basis' }
+  });
+</script>
 </body>
 </html>
