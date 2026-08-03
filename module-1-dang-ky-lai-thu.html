@@ -12,6 +12,11 @@
   :root{--accent:#1a916c;--accent-soft:rgba(26,145,108,.15);--accent-ink:#74dcae}
   .tbl-scroll{text-align:center}
   .tbl-scroll svg{display:inline-block;margin:0 auto}
+  /* tiêu đề phụ cho từng bảng dữ liệu */
+  .tbl-title{font-size:14.5px;font-weight:600;margin:18px 0 8px;display:flex;align-items:center;gap:9px}
+  .tbl-title:first-of-type{margin-top:10px}
+  .tbl-title .code{font-family:ui-monospace,Consolas,monospace}
+  .tbl-title .note{font-weight:400;font-size:13px;color:var(--dim)}
 </style>
 </head>
 <body>
@@ -149,6 +154,8 @@ flowchart TD
   <!-- ===================== DỮ LIỆU ===================== -->
   <section>
     <h2>Dữ liệu chính</h2>
+
+    <h3 class="tbl-title"><span class="code">LICH_LAI_THU</span><span class="note">Mỗi dòng là một lượt đăng ký lái thử</span></h3>
     <div class="tbl-scroll">
       <table>
         <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
@@ -156,13 +163,21 @@ flowchart TD
         <tr><td><code>Số điện thoại</code></td><td>Text</td><td>Có (hoặc Email)</td><td>Dùng để gửi thông báo lịch lái thử</td></tr>
         <tr><td><code>Email</code></td><td>Text</td><td>Có (hoặc SĐT)</td><td>Dùng để gửi thông báo lịch lái thử</td></tr>
         <tr><td><code>Mẫu xe muốn lái thử</code></td><td>Text</td><td>Có</td><td>Xe khách chọn để lái thử</td></tr>
+        <tr><td><code>Showroom lái thử</code></td><td>Liên kết → <code>SHOWROOM.Mã showroom</code></td><td>Có</td><td>Showroom khách chọn để đến lái thử</td></tr>
         <tr><td><code>Thời gian mong muốn</code></td><td>Ngày giờ</td><td>Có</td><td>Khung giờ khách chọn lúc đăng ký</td></tr>
         <tr><td><code>Thời gian xác nhận</code></td><td>Ngày giờ</td><td>Có (sau khi xác nhận)</td><td>Có thể khác thời gian mong muốn nếu phải dời lịch</td></tr>
         <tr><td><code>Trạng thái lịch hẹn</code></td><td>Enum</td><td>Có</td><td>Chờ xác nhận / Đã xác nhận / Đã gửi thông báo</td></tr>
         <tr><td><code>Sales phụ trách</code></td><td>Text</td><td>Có</td><td>Người xác nhận lịch, được gán tự động với khu vực mà khách chọn</td></tr>
         <tr><td><code>Kênh đăng ký</code></td><td>Enum</td><td>Có</td><td>Website / CRM (Sales nhập hộ) — xác định nguồn tạo lịch hẹn</td></tr>
-        <tr><td><code>Nhân viên nhập hộ</code></td><td>Text</td><td>Có, nếu Kênh = CRM</td><td>Tên Sales đã nhập hộ thông tin thay khách hàng</td></tr>
-        <tr><td><code>Hình thức tiếp nhận</code></td><td>Enum</td><td>Có, nếu Kênh = CRM</td><td>Gọi điện / Đến trực tiếp cửa hàng — cách khách liên hệ khi được Sales nhập hộ</td></tr>
+      </table>
+    </div>
+
+    <h3 class="tbl-title"><span class="code">SHOWROOM</span><span class="note">Danh mục các showroom cửa hàng đang quản lý</span></h3>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code>Mã showroom</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh duy nhất, ví dụ <code>SR1</code>; được <code>LICH_LAI_THU.Showroom lái thử</code> tham chiếu tới</td></tr>
+        <tr><td><code>Tên showroom</code></td><td>Text</td><td>Có</td><td>Tên hiển thị cho khách chọn khi đăng ký(SHOWROOM 1)</td></tr>
       </table>
     </div>
   </section>
