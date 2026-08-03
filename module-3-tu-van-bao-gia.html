@@ -39,7 +39,7 @@
     <div><b>Actor phụ</b><span>Hệ thống RAG hỗ trợ tra cứu thông tin; phân tích dữ liệu tin nhắn khách hàng gửi</span></div>
     <div><b>Đầu vào</b><span>Thông tin khách hàng hỏi mua xe</span></div>
     <div><b>Đầu ra</b><span>Khách hàng có quyết định mua xe hay không</span></div>
-    <div><b>Kênh / hệ thống liên quan</b><span data-ph="…"></span></div>
+    <div><b>Kênh / hệ thống liên quan</b><span>Hệ thống RAG (tra cứu specs · giá · khuyến mãi); AI phân tích tin nhắn &amp; hình ảnh khách gửi; Kênh chat (Website · Zalo · Telegram · hotline); CRM (lưu lịch sử trao đổi)</span></div>
     <div><b>Module kế tiếp</b><span>Chốt deal</span></div>
   </div>
 
@@ -84,28 +84,28 @@ flowchart TD
 
       <!-- Sao chép nguyên khối <div class="req"> bên dưới để thêm yêu cầu mới -->
       <div class="req">
-        <div class="rh"><span class="code" data-ph="BG-M01"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">BG-M01</span><span class="rt">Tra cứu thông tin sản phẩm qua hệ thống RAG</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Mọi thông tin về specs, giá, khuyến mãi, chính sách bán hàng mà Sales đưa cho khách phải lấy từ hệ thống RAG — không được trả lời dựa trên trí nhớ. RAG đảm bảo Sales nói đúng thông tin mới nhất và thống nhất giữa các chi nhánh.</p>
       </div>
 
       <div class="req">
-        <div class="rh"><span class="code" data-ph="BG-M02"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">BG-M02</span><span class="rt">Phân tích nhu cầu &amp; ngân sách từ tin nhắn khách</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Hệ thống AI phải phân tích toàn bộ tin nhắn (text) và hình ảnh khách gửi qua các kênh để trích xuất nhu cầu sử dụng, ngân sách dự kiến, dòng xe quan tâm… trước khi Sales tư vấn. Sales dùng kết quả phân tích làm đầu vào, không hỏi lại những gì khách đã nói.</p>
       </div>
 
       <div class="req">
-        <div class="rh"><span class="code" data-ph="BG-M03"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">BG-M03</span><span class="rt">Báo giá phù hợp ngân sách &amp; nhu cầu khách</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Báo giá đưa cho khách phải căn cứ vào nhu cầu &amp; ngân sách đã phân tích ở BG-M02, không báo tất cả các dòng xe có trong hệ thống. Mỗi báo giá ghi rõ mẫu xe, phiên bản, giá niêm yết, khuyến mãi áp dụng, phương án trả góp (nếu có).</p>
       </div>
 
       <div class="req">
-        <div class="rh"><span class="code" data-ph="BG-M04"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">BG-M04</span><span class="rt">Sales xác nhận lại báo giá trước khi gửi khách</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Trước khi gửi báo giá qua kênh chat, Sales phải xác nhận lại lần cuối: đúng mẫu xe khách quan tâm, đúng giá hiện hành, không sót khuyến mãi đang áp dụng. Không gửi báo giá dùng số liệu cũ hoặc chưa kiểm tra.</p>
       </div>
 
       <div class="req">
-        <div class="rh"><span class="code" data-ph="BG-M05"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">BG-M05</span><span class="rt">Ghi nhận quyết định mua &amp; lý do không mua</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Sau mỗi lượt tư vấn, Sales phải cập nhật vào CRM: (a) khách đồng ý mua → chuyển sang Module 4 — Chốt deal; (b) khách từ chối hoặc chưa quyết → ghi lý do (giá cao, chờ thu nhập, đang so sánh hãng khác…) và toàn bộ nội dung trao đổi để nuôi dưỡng lại sau.</p>
       </div>
 
     </div>
@@ -146,11 +146,17 @@ flowchart TD
     <div class="tbl-scroll">
       <table>
         <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td><code>Họ tên khách hàng</code></td><td>Text</td><td>Có</td><td>Khách đang được tư vấn (lấy từ CRM — profile sau đăng ký lái thử)</td></tr>
+        <tr><td><code>Số điện thoại</code></td><td>Text</td><td>Có</td><td>Dùng để trao đổi qua Zalo/Telegram/hotline</td></tr>
+        <tr><td><code>Email</code></td><td>Text</td><td>Không</td><td>Phục vụ gửi báo giá &amp; tài liệu kỹ thuật</td></tr>
+        <tr><td><code>Nhu cầu sử dụng</code></td><td>Text</td><td>Có</td><td>Đi phố, gia đình, đường dài, kinh doanh… (AI trích xuất từ tin nhắn)</td></tr>
+        <tr><td><code>Ngân sách dự kiến</code></td><td>Number</td><td>Có</td><td>Khoảng giá khách mong muốn, kèm khả năng trả góp (nếu có)</td></tr>
+        <tr><td><code>Dòng xe quan tâm</code></td><td>Enum</td><td>Có</td><td>Một hoặc nhiều dòng xe khách nhắc đến trong chat</td></tr>
+        <tr><td><code>Báo giá đã gửi</code></td><td>List&lt;Báo giá&gt;</td><td>Có</td><td>Lịch sử các báo giá Sales đã gửi cho khách (mẫu xe · giá · KM · phương án trả góp)</td></tr>
+        <tr><td><code>Quyết định mua</code></td><td>Enum</td><td>Có</td><td>Đồng ý mua / Từ chối / Chưa quyết — cập nhật sau mỗi lượt tư vấn</td></tr>
+        <tr><td><code>Lý do không mua</code></td><td>Text</td><td>Có, nếu Từ chối / Chưa quyết</td><td>Giá cao · chờ thu nhập · so sánh hãng khác · chưa có nhu cầu gấp…</td></tr>
+        <tr><td><code>Sales phụ trách</code></td><td>Text</td><td>Có</td><td>Người trực tiếp tư vấn &amp; báo giá</td></tr>
+        <tr><td><code>Lịch sử trao đổi</code></td><td>Log</td><td>Có</td><td>Toàn bộ tin nhắn (text + hình ảnh) giữa khách và Sales, lưu để nuôi dưỡng lại nếu khách chưa chốt</td></tr>
       </table>
     </div>
   </section>
