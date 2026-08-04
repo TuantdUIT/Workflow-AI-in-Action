@@ -404,10 +404,7 @@ boot();
       ['mã nhân viên phụ trách','uuid · FK'],
       ['kênh đăng ký','enum']
     ]},
-    // bảng đơn hàng — sinh ra ở module Chốt deal, là nguồn dữ liệu doanh thu
-    // cho module Dashboard chi nhánh. Bản MVP: chỉ tạo dòng khi khách ĐÃ đặt cọc,
-    // nên không có trạng thái "chờ cọc" và không lưu deal thất bại.
-    { name:'orders', tone:'amber', x:330, y:560, w:250, fields:[
+    { name:'orders', tone:'amber', x:365, y:590, w:250, fields:[
       ['mã đơn hàng','uuid · PK'],
       ['mã khách hàng','uuid · FK'],
       ['mã nhân viên','uuid · FK'],
@@ -419,8 +416,6 @@ boot();
       ['ngày bàn giao','datetime'],
       ['trạng thái','enum']
     ], note:['chỉ tạo khi khách đã đặt cọc','trạng thái: đã cọc → đã ký HĐ → đã chốt deal'] },
-    // bảng hợp đồng mua bán — tách riêng khỏi internal_documents vì đây là
-    // chứng từ pháp lý của từng đơn hàng, không phải tài liệu tư vấn dùng chung
     { name:'contracts', tone:'amber', x:700, y:720, w:235, fields:[
       ['mã hợp đồng','uuid · PK'],
       ['mã đơn hàng','uuid · FK'],
@@ -428,27 +423,20 @@ boot();
       ['ngày ký','datetime'],
       ['đường dẫn file','string']
     ]},
-    // kho tài liệu dùng chung cho tư vấn · báo giá (brochure, bảng giá,
-    // chính sách) — không lưu hợp đồng, nên không có quan hệ với bảng nào
-    { name:'internal_documents', tone:'rust', x:700, y:100, w:235, fields:[
+    { name:'internal_documents', tone:'rust', x:710, y:75, w:235, fields:[
       ['mã tài liệu','uuid · PK'],
       ['nhãn phân loại','enum'],
       ['tên tài liệu','string'],
       ['đường dẫn','string']
     ], note:['tài liệu phục vụ tư vấn · báo giá','(brochure, bảng giá, chính sách)'] },
-    // bảng danh mục xe — gắn vào hệ thống qua orders.mã xe
     { name:'models', tone:'purple', x:700, y:560, w:195, fields:[
       ['mã xe','uuid · PK'],
       ['tên xe','string']
     ], note:['nguồn dữ liệu đổ vào dropdown','chọn xe trên form đăng ký'] },
-    // bảng danh mục giờ lái thử — chỉ chứa 1 thông tin, dùng để đổ dữ liệu
-    // vào dropdown chọn giờ trên form đăng ký
-    { name:'driving_hours', tone:'purple', x:40, y:700, w:195, fields:[
+    { name:'driving_hours', tone:'purple', x:1015, y:125, w:195, fields:[
       ['giờ lái','time · PK']
     ], note:['nguồn dữ liệu đổ vào dropdown','chọn giờ trên form đăng ký'] },
-    // ===== bảng phục vụ kênh Telegram (1 bot duy nhất) =====
-    // khung chat — mỗi dòng là một câu trao đổi giữa khách và hệ thống
-    { name:'telegram_messages', tone:'sky', x:985, y:400, w:245, fields:[
+    { name:'telegram_messages', tone:'sky', x:1015, y:405, w:245, fields:[
       ['mã tin nhắn','uuid · PK'],
       ['mã khách hàng','uuid · FK'],
       ['mã nhân viên','uuid · FK'],
@@ -456,37 +444,44 @@ boot();
       ['nội dung','text'],
       ['telegram message id','bigint'],
       ['thời gian','datetime']
-    ], note:['chiều: in (khách gửi) · out (bot hoặc sales gửi)','mã nhân viên rỗng = tin do bot tự động gửi'] }
+    ], note:['chiều: in (khách gửi) · out (bot hoặc sales gửi)','mã nhân viên rỗng = tin do bot tự động gửi'] },
+    { name:'marketing_content', tone:'blue', x:25, y:695, w:220, fields:[
+      ['mã nội dung','uuid · PK'],
+      ['mã nhân viên','uuid · FK'],
+      ['loại nội dung','string'],
+      ['tiêu đề','string'],
+      ['nội dung','text'],
+      ['thời gian tạo','datetime']
+    ]}
   ];
 
-  // Đường nối: đi theo góc vuông, bo góc; mũi tên đặt ở đầu bảng con (phía n)
   const links = [
-    // showrooms 1 — n employees
-    { c:'#1a916c', d:'M350,59 H147 Q137,59 137,69 V224', lx:250, ly:50 },
-    // showrooms 1 — n customers
-    { c:'#1a916c', d:'M455,102 V164', lx:468, ly:138, anchor:'start' },
-    // showrooms 1 — n orders (đi vòng bên phải customers để không cắt bảng)
-    { c:'#1a916c', d:'M560,59 H660 Q670,59 670,69 V530 Q670,540 660,540 H545 Q535,540 535,550 V554',
-      lx:682, ly:300, anchor:'start' },
-    // employees 1 — n customers
-    { c:'#2076b8', d:'M255,313 H324', lx:290, ly:303 },
-    // employees 1 — n orders (Sales chốt deal)
-    { c:'#2076b8', d:'M137,397 V610 Q137,620 147,620 H324', lx:240, ly:611 },
-    // customers 1 — n orders
-    { c:'#2076b8', d:'M455,499 V554', lx:468, ly:530, anchor:'start' },
-    // models 1 — n orders
-    { c:'#5b45a6', d:'M700,603 H584', lx:642, ly:593 },
-    // orders 1 — 1 contracts (mỗi đơn hàng đã ký sinh đúng một hợp đồng)
-    { c:'#c8922e', d:'M580,803 H694', lx:637, ly:793, lbl:'1 – 1' },
-    // customers 1 — n telegram_messages (xương sống: mọi tin nhắn truy về một khách)
-    { c:'#2b8fb5', d:'M585,470 H981', lx:800, ly:462 },
-    // employees 1 — n telegram_messages (sales nhắn tay; đi vòng mép dưới cho khỏi cắt bảng)
-    { c:'#2b8fb5', d:'M20,350 H16 Q6,350 6,360 V940 Q6,950 16,950 H950 Q970,950 970,930 V590 Q970,580 980,580 H981',
-      lx:500, ly:942 }
+    // showrooms 1 – n employees
+    { c:'#1a916c', d:'M350,59 H147 Q137,59 137,69 V224', lx:161, ly:51 },
+    // showrooms 1 – n customers
+    { c:'#1a916c', d:'M455,102 V164', lx:455, ly:125, anchor:'start' },
+    // showrooms 1 – n orders
+    { c:'#1a916c', d:'M560,59 H660 Q670,59 670,69 V537.5 Q670,540 670,537.5 V536.3 Q670,535 668.8,535 H580 Q570,535 570,545 V584', lx:670, ly:314, anchor:'start' },
+    // employees 1 – n customers
+    { c:'#2076b8', d:'M255,313 H324', lx:290, ly:305 },
+    // employees 1 – n orders
+    { c:'#2076b8', d:'M219.3,397 V615 H220 H289.5 V615.6 H359', lx:219, ly:568 },
+    // customers 1 – n orders
+    { c:'#2076b8', d:'M455,499 V531.5 Q455,541.5 465,541.5 H480 Q490,541.5 490,551.5 V584', lx:473, ly:534, anchor:'start' },
+    // models 1 – n orders
+    { c:'#5b45a6', d:'M700,603 H669.5 Q659.5,603 659.5,613 V623 Q659.5,633 649.5,633 H619', lx:660, ly:610 },
+    // orders 1 – 1 contracts
+    { c:'#c8922e', d:'M615,833 H644.5 Q654.5,833 654.5,823 V813 Q654.5,803 664.5,803 H694', lx:655, ly:810, lbl:'1 – 1' },
+    // customers 1 – n telegram_messages
+    { c:'#2b8fb5', d:'M585,470 H795.5 Q798,470 798,472.5 V473.8 Q798,475 799.3,475 H1011', lx:798, ly:465 },
+    // employees 1 – n telegram_messages
+    { c:'#2b8fb5', d:'M20,350 H13 Q6,350 6,357 V940 Q6,950 16,950 H967.5 Q970,950 972.5,950 H973.8 Q975,950 975,948.8 V820 Q975,810 975,800 V636 Q975,626 985,626 H1011', lx:364, ly:942 },
+    // employees 1 – n marketing_content
+    { c:'#a04a2a', d:'M136.3,397 V689', lx:136, ly:535 }
   ];
 
   let defs = '', body = '';
-  const AH = ['#1a916c','#2076b8','#5b45a6','#c8922e','#2b8fb5'];
+  const AH = ['#1a916c','#2076b8','#5b45a6','#c8922e','#2b8fb5','#a04a2a'];
   AH.forEach((c,i) => {
     defs += `<marker id="erd-ah${i}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
       orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="${c}" stroke-width="1.6"

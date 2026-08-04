@@ -1,14 +1,23 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Module 3 — Marketing Automation</title>
+<title>Module 2 — Marketing Automation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="module-style.css">
-<style>:root{--accent:#5b45a6;--accent-soft:rgba(91,69,166,.2);--accent-ink:#bcaef0}</style>
+<style>
+  :root{--accent:#5b45a6;--accent-soft:rgba(91,69,166,.2);--accent-ink:#bcaef0}
+  .tbl-scroll{text-align:center}
+  .tbl-scroll svg{display:inline-block;margin:0 auto}
+  /* tiêu đề phụ cho từng bảng dữ liệu */
+  .tbl-title{font-size:14.5px;font-weight:600;margin:18px 0 8px;display:flex;align-items:center;gap:9px}
+  .tbl-title:first-of-type{margin-top:10px}
+  .tbl-title .code{font-family:ui-monospace,Consolas,monospace}
+  .tbl-title .note{font-weight:400;font-size:13px;color:var(--dim)}
+</style>
 </head>
 <body>
 
@@ -27,39 +36,51 @@
   <div class="hero">
     <span class="badge">Actor: Sales</span>
     <h1>Chăm sóc khách hàng</h1>
-    <p class="lead" data-ph="Mô tả ngắn 2–3 dòng về module này…"></p>
+    <p class="lead">Module này đào tạo nhân viên nắm vững quy trình chăm sóc khách hàng toàn diện tại VinFast, từ giai đoạn tiền bán hàng (Lái thử), hậu mãi (Bảo dưỡng/Sửa chữa), đến giải quyết khiếu nại, với sự hỗ trợ đắc lực từ các AI Agent đa kênh.</p>
   </div>
 
   <div class="meta">
-    <div><b>Actor chính</b><span data-ph="…"></span></div>
-    <div><b>Actor phụ</b><span data-ph="…"></span></div>
-    <div><b>Đầu vào</b><span data-ph="…"></span></div>
-    <div><b>Đầu ra</b><span data-ph="…"></span></div>
-    <div><b>Kênh / hệ thống liên quan</b><span data-ph="…"></span></div>
-    <div><b>Module kế tiếp</b><span data-ph="…"></span></div>
+    <div><b>Actor chính</b><span>Nhân viên Sales (Tư vấn bán hàng), Nhân viên CSKH (Call Center/Human Agent).</span></div>
+    <div><b>Actor phụ</b><span>Khách hàng, Hệ thống tự động/CRM.</span></div>
+    <div><b>Đầu vào</b><span>Thông tin liên lạc của khách, tài liệu tư vấn</span></div>
+    <div><b>Đầu ra</b><span>Chuyển đổi từ khách hàng lái thử sang khách hàng thật sự tìm hiểu để mua xe</span></div>
+    <div><b>Kênh / hệ thống liên quan</b><span>Chat (Zalo, Telegram), Email, Hệ thống CRM nội bộ.</span></div>
+    <div><b>Module kế tiếp</b><span>Tư vấn &amp; Báo giá</span></div>
   </div>
 
   <!-- ===================== MỤC TIÊU ===================== -->
   <section>
     <h2>Mục tiêu module</h2>
-    <p class="desc" data-ph="Một câu dẫn cho phần mục tiêu (có thể xóa dòng này)…"></p>
     <ul class="list">
-      <li data-ph="Mục tiêu 1…"></li>
-      <li data-ph="Mục tiêu 2…"></li>
-      <li data-ph="Mục tiêu 3…"></li>
+      <li>Cung cấp thông tin kịp thời, chính xác, đều đặn về sản phẩm</li>
+      <li>Tạo cảm giác được quan tâm, chăm sóc</li>
+      <li>Giúp khách hàng ra quyết định mua xe nhanh chóng, thuận tiện</li>
     </ul>
   </section>
 
   <!-- ===================== LUỒNG NGHIỆP VỤ ===================== -->
   <section>
     <h2>Luồng nghiệp vụ chính</h2>
-    <ol class="flow">
-      <li data-ph="Bước 1…"></li>
-      <li data-ph="Bước 2…"></li>
-      <li data-ph="Bước 3…"></li>
-      <li data-ph="Bước 4…"></li>
-      <li data-ph="Bước 5…"></li>
-    </ol>
+    <div class="tbl-scroll">
+      <pre class="mermaid">
+flowchart TD
+    A(["Hoàn thành lái thử xe điện"]) --> B["Cảm ơn và thông tin xe<br/>Gửi trong ngày lái thử"]
+    B --> C["Giải đáp lo ngại xe điện, các thông tin mới về sản phẩm,<br/>sự kiện hoặc các chiến dịch ưu đãi<br/>Gửi sau 2 ngày"]
+    B --> D["Case study khách đã mua,<br/>kèm ưu đãi<br/>Gửi sau 2 ngày"]
+    C --> E{"Khách quan tâm,<br/>có nhu cầu mua xe?"}
+    D --> E
+    E -->|Có| F(["Chuyển sang module<br/>Tư vấn · Báo giá"])
+    E -->|Chưa có động tĩnh| G["Tiếp tục gửi thông tin cho khách,<br/>theo dõi trạng thái trên CRM"]
+    G -->|Chu kỳ 2 ngày| E
+
+    classDef startend fill:#1a916c,stroke:#74dcae,color:#0d0d0f,font-weight:600,stroke-width:2px;
+    classDef decision fill:#1a1a20,stroke:#e0954a,color:#f2f2f4,stroke-width:2px;
+    classDef step fill:#141419,stroke:#282830,color:#f2f2f4;
+    class A,F startend
+    class E decision
+    class B,C,D,G step
+      </pre>
+    </div>
   </section>
 
   <!-- ===================== YÊU CẦU BẮT BUỘC ===================== -->
@@ -70,28 +91,24 @@
 
       <!-- Sao chép nguyên khối <div class="req"> bên dưới để thêm yêu cầu mới -->
       <div class="req">
-        <div class="rh"><span class="code" data-ph="MA-M01"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">MA-M01</span><span class="rt">Phân biệt rõ thông tin tham khảo và báo giá chính thức</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Mọi thông tin về vận hành, nội thất, giá bán hoặc bảng giá gửi qua Zalo/Telegram/Email trong giai đoạn chăm sóc sau lái thử phải được ghi chú rõ là "thông tin/bảng giá tham khảo", không phải báo giá chính thức. Nhân viên không được cam kết giá, ưu đãi hoặc điều khoản tài chính cụ thể ở giai đoạn này để tránh xung đột với báo giá điện tử chính thức tại module Tư vấn · Báo giá.</p>
       </div>
 
       <div class="req">
-        <div class="rh"><span class="code" data-ph="MA-M02"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">MA-M02</span><span class="rt">Giới hạn tần suất liên hệ &amp; tôn trọng lựa chọn khách hàng</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Không được gửi khuyến mãi/nhắc nhở vượt quá số lần tối đa theo chu kỳ quy định (vd. 3 lần) khi khách không phản hồi. Phải dừng gửi ngay lập tức nếu khách hàng yêu cầu ngừng nhận tin, và cập nhật trạng thái "Không quan tâm" trên CRM đúng thời điểm để tránh tiếp tục làm phiền khách hàng.</p>
       </div>
 
       <div class="req">
-        <div class="rh"><span class="code" data-ph="MA-M03"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">MA-M03</span><span class="rt">Liên hệ đúng kênh khách hàng đã đăng ký</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Toàn bộ nội dung chăm sóc sau lái thử (thông tin xe, bảng giá tham khảo, chương trình khuyến mãi) phải được gửi qua đúng kênh Zalo, Telegram hoặc Email mà khách hàng đã đăng ký hoặc từng sử dụng. Không tự ý chuyển sang kênh khác hoặc thu thập thêm kênh liên hệ mới khi chưa có sự đồng ý của khách hàng.</p>
       </div>
 
-      <div class="req">
-        <div class="rh"><span class="code" data-ph="MA-M04"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
-      </div>
 
       <div class="req">
-        <div class="rh"><span class="code" data-ph="MA-M05"></span><span class="rt" data-ph="Tên yêu cầu…"></span><span class="tag">Bắt buộc</span></div>
-        <p class="rd" data-ph="Diễn giải chi tiết…"></p>
+        <div class="rh"><span class="code">MA-M05</span><span class="rt">Ghi nhận lịch sử tương tác &amp; bảo mật dữ liệu khách hàng</span><span class="tag">Bắt buộc</span></div>
+        <p class="rd">Mọi tin nhắn gửi đi, phản hồi nhận được, số lần nhắc và kết quả xử lý cuối cùng (chuyển tư vấn / theo dõi dài hạn / dừng chăm sóc) phải được cập nhật đầy đủ, chính xác trên CRM để phục vụ tra cứu và tránh liên hệ trùng lặp. Dữ liệu cá nhân của khách hàng (thông tin định danh, lịch sử trao đổi) không được sao chép, chia sẻ hoặc đưa vào các công cụ, nền tảng chưa được công ty cho phép.</p>
       </div>
 
     </div>
@@ -129,14 +146,47 @@
   <!-- ===================== DỮ LIỆU ===================== -->
   <section>
     <h2>Dữ liệu chính</h2>
+
+    <h3 class="tbl-title"><span class="code">customers</span><span class="note">Hồ sơ khách hàng — nguồn danh sách cần chăm sóc sau lái thử</span></h3>
     <div class="tbl-scroll">
       <table>
         <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><td><code>Mã khách hàng</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh duy nhất của khách</td></tr>
+        <tr><td><code>Họ tên khách hàng</code></td><td>Text</td><td>Có</td><td>Tên khách hàng đã lái thử</td></tr>
+        <tr><td><code>Số điện thoại</code></td><td>Text</td><td>Có (hoặc Email)</td><td>Kênh liên hệ Zalo / gọi điện</td></tr>
+        <tr><td><code>Email</code></td><td>Text</td><td>Có (hoặc SĐT)</td><td>Kênh gửi nội dung chăm sóc qua email</td></tr>
+        <tr><td><code>Mẫu xe quan tâm</code></td><td>Text</td><td>Có</td><td>Căn cứ chọn nội dung gửi cho đúng dòng xe</td></tr>
+        <tr><td><code>Showroom lái thử</code></td><td>Liên kết → <code>showrooms.Mã showroom</code></td><td>Có</td><td>Showroom khách đã tới lái thử</td></tr>
+        <tr><td><code>Thời gian xác nhận</code></td><td>Ngày giờ</td><td>Có</td><td>Mốc tính lịch gửi tin: trong ngày, sau 2 ngày…</td></tr>
+        <tr><td><code>Trạng thái chăm sóc</code></td><td>Enum</td><td>Có</td><td>Đang chăm sóc / Quan tâm mua xe / Không phản hồi</td></tr>
+        <tr><td><code>Sales phụ trách</code></td><td>Liên kết → <code>employees.Mã nhân viên</code></td><td>Có</td><td>Sales theo dõi và tiếp nhận khi khách phản hồi</td></tr>
+        <tr><td><code>Kênh đăng ký</code></td><td>Enum</td><td>Có</td><td>Xác định kênh được phép gửi tin — xem <code>MA-M03</code></td></tr>
+      </table>
+    </div>
+
+    <h3 class="tbl-title"><span class="code">marketing_content</span><span class="note">Kho tin bài dùng lại — mỗi dòng là một mẫu nội dung</span></h3>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code>Mã nội dung</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh duy nhất của tin bài</td></tr>
+        <tr><td><code>Mã nhân viên</code></td><td>Liên kết → <code>employees.Mã nhân viên</code></td><td>Có</td><td>Người soạn nội dung</td></tr>
+        <tr><td><code>Loại nội dung</code></td><td>Enum</td><td>Có</td><td>Cảm ơn / Giải đáp lo ngại / Case study / Khuyến mãi — khớp các node trong luồng</td></tr>
+        <tr><td><code>Tiêu đề</code></td><td>Text</td><td>Có</td><td>Tên hiển thị để Sales chọn khi gửi</td></tr>
+        <tr><td><code>Nội dung</code></td><td>Text dài</td><td>Có</td><td>Thân tin bài gửi cho khách</td></tr>
+        <tr><td><code>Thời gian tạo</code></td><td>Ngày giờ</td><td>Có</td><td>Dùng để lọc nội dung còn hiệu lực</td></tr>
+      </table>
+    </div>
+
+    <h3 class="tbl-title"><span class="code">telegram_messages</span><span class="note">Nhật ký gửi — mỗi dòng là một lượt trao đổi với khách</span></h3>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code>Mã tin nhắn</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh duy nhất của lượt gửi</td></tr>
+        <tr><td><code>Mã khách hàng</code></td><td>Liên kết → <code>customers.Mã khách hàng</code></td><td>Có</td><td>Mọi tin nhắn đều truy về một khách</td></tr>
+        <tr><td><code>Mã nhân viên</code></td><td>Liên kết → <code>employees.Mã nhân viên</code></td><td>Không</td><td>Để rỗng nghĩa là tin do hệ thống tự động gửi</td></tr>
+        <tr><td><code>Chiều</code></td><td>Enum</td><td>Có</td><td>in (khách gửi) / out (hệ thống hoặc Sales gửi)</td></tr>
+        <tr><td><code>Nội dung</code></td><td>Text dài</td><td>Có</td><td>Nội dung thực tế đã gửi hoặc nhận</td></tr>
+        <tr><td><code>Thời gian</code></td><td>Ngày giờ</td><td>Có</td><td>Căn cứ đếm chu kỳ 2 ngày và số lần đã gửi</td></tr>
       </table>
     </div>
   </section>
@@ -174,5 +224,26 @@
   </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    fontFamily: 'Inter, system-ui, sans-serif',
+    themeVariables: {
+      background: '#0d0d0f',
+      primaryColor: '#141419',
+      primaryTextColor: '#f2f2f4',
+      primaryBorderColor: '#282830',
+      lineColor: '#6f757d',
+      secondaryColor: '#1a1a20',
+      tertiaryColor: '#101014',
+      edgeLabelBackground: '#141419',
+      fontSize: '14px'
+    },
+    flowchart: { curve: 'basis' }
+  });
+</script>
 </body>
 </html>

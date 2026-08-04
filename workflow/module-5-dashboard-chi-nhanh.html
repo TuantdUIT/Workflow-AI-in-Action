@@ -128,14 +128,67 @@
   <!-- ===================== DỮ LIỆU ===================== -->
   <section>
     <h2>Dữ liệu chính</h2>
+
+    <h3 class="tbl-title"><span class="code">orders</span><span class="note">Nguồn chính để tính doanh thu, số xe bán và tiến độ bàn giao</span></h3>
     <div class="tbl-scroll">
       <table>
-        <tr><th>Chỉ số / Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
-        <tr><td><code data-ph="field_name"></code></td><td data-ph="…"></td><td data-ph="…"></td><td data-ph="…"></td></tr>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code>Mã đơn hàng</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh đơn hàng để drill-down từ dashboard</td></tr>
+        <tr><td><code>Mã khách hàng</code></td><td>Liên kết → <code>customers.Mã khách hàng</code></td><td>Có</td><td>Dùng tính chuyển đổi từ khách tiềm năng sang đơn hàng</td></tr>
+        <tr><td><code>Mã nhân viên</code></td><td>Liên kết → <code>employees.Mã nhân viên</code></td><td>Có</td><td>Trục tính doanh số theo Sales</td></tr>
+        <tr><td><code>Mã showroom</code></td><td>Liên kết → <code>showrooms.Mã showroom</code></td><td>Có</td><td>Trục lọc chính của dashboard chi nhánh</td></tr>
+        <tr><td><code>Mã xe</code></td><td>Liên kết → <code>models.Mã xe</code></td><td>Có</td><td>Trục thống kê theo dòng xe/model</td></tr>
+        <tr><td><code>Tổng giá trị</code></td><td>Số</td><td>Có</td><td>Nguồn tính doanh thu</td></tr>
+        <tr><td><code>Tiền đặt cọc</code></td><td>Số</td><td>Có</td><td>Nguồn tính số đơn đã cọc và giá trị cọc</td></tr>
+        <tr><td><code>Ngày đặt cọc</code></td><td>Ngày giờ</td><td>Có</td><td>Mốc thời gian cho bộ lọc ngày/tháng/quý</td></tr>
+        <tr><td><code>Ngày bàn giao</code></td><td>Ngày giờ</td><td>Sau khi bàn giao</td><td>Dùng tính tiến độ và số xe đã bàn giao</td></tr>
+        <tr><td><code>Trạng thái</code></td><td>Enum</td><td>Có</td><td>Đã cọc / Đã ký hợp đồng / Đã chốt deal</td></tr>
+      </table>
+    </div>
+
+    <h3 class="tbl-title"><span class="code">customers</span><span class="note">Nguồn tính khách tiềm năng, trạng thái chăm sóc và chuyển đổi</span></h3>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code>Mã khách hàng</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh khách hàng xuyên suốt các module</td></tr>
+        <tr><td><code>Họ tên khách hàng</code></td><td>Text</td><td>Có</td><td>Hiển thị khi xem chi tiết khách</td></tr>
+        <tr><td><code>Số điện thoại</code></td><td>Text</td><td>Có (hoặc Email)</td><td>Dùng đối soát với hồ sơ chăm sóc</td></tr>
+        <tr><td><code>Email</code></td><td>Text</td><td>Có (hoặc SĐT)</td><td>Dùng đối soát với hồ sơ chăm sóc</td></tr>
+        <tr><td><code>Mẫu xe quan tâm</code></td><td>Text</td><td>Có</td><td>Trục thống kê nhu cầu theo dòng xe</td></tr>
+        <tr><td><code>Showroom lái thử</code></td><td>Liên kết → <code>showrooms.Mã showroom</code></td><td>Có</td><td>Gắn khách với chi nhánh/showroom</td></tr>
+        <tr><td><code>Trạng thái chăm sóc</code></td><td>Enum</td><td>Có</td><td>Đang chăm sóc / Quan tâm mua xe / Không phản hồi / Đã mua</td></tr>
+        <tr><td><code>Sales phụ trách</code></td><td>Liên kết → <code>employees.Mã nhân viên</code></td><td>Có</td><td>Trục lọc khách theo Sales</td></tr>
+        <tr><td><code>Kênh đăng ký</code></td><td>Enum</td><td>Có</td><td>Website / CRM (Sales nhập hộ) — dùng phân tích nguồn khách</td></tr>
+      </table>
+    </div>
+
+    <h3 class="tbl-title"><span class="code">employees</span><span class="note">Danh mục Sales và nhân sự thuộc từng showroom</span></h3>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code>Mã nhân viên</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh Sales để gom doanh số và khách phụ trách</td></tr>
+        <tr><td><code>Họ tên</code></td><td>Text</td><td>Có</td><td>Tên hiển thị trên dashboard</td></tr>
+        <tr><td><code>Email</code></td><td>Text</td><td>Có</td><td>Thông tin liên hệ nội bộ</td></tr>
+        <tr><td><code>Số điện thoại</code></td><td>Text</td><td>Không</td><td>Thông tin liên hệ nội bộ</td></tr>
+        <tr><td><code>Mã showroom</code></td><td>Liên kết → <code>showrooms.Mã showroom</code></td><td>Có</td><td>Gắn nhân viên với chi nhánh để lọc dashboard</td></tr>
+      </table>
+    </div>
+
+    <h3 class="tbl-title"><span class="code">showrooms</span><span class="note">Danh mục chi nhánh/showroom dùng làm bộ lọc tổng quan</span></h3>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code>Mã showroom</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh chi nhánh/showroom</td></tr>
+        <tr><td><code>Tên showroom</code></td><td>Text</td><td>Có</td><td>Tên hiển thị trong bộ lọc và biểu đồ</td></tr>
+      </table>
+    </div>
+
+    <h3 class="tbl-title"><span class="code">models</span><span class="note">Danh mục dòng xe/model dùng cho thống kê sản phẩm</span></h3>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code>Mã xe</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh model xe</td></tr>
+        <tr><td><code>Tên xe</code></td><td>Text</td><td>Có</td><td>Tên hiển thị trong biểu đồ theo dòng xe</td></tr>
       </table>
     </div>
   </section>

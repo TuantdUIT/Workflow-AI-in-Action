@@ -61,7 +61,7 @@
 flowchart TD
     ST(["Khách hàng đồng ý mua xe<br/>(từ Tư vấn · báo giá)"]) --> A["Sales lập đơn hàng &amp; báo giá<br/>chính thức trên CRM"]
     A --> B{"Khách đồng ý đặt cọc?"}
-    B -->|Không| Z["Sales ghi nhận lý do,<br/>chuyển lại Nuôi dưỡng khách hàng"]
+    B -->|Không| Z["Sales ghi nhận lý do,<br/>chuyển lại Chăm sóc khách hàng"]
     Z --> ZZ(["Kết thúc — chưa chốt deal"])
     B -->|Có| C["Khách đặt cọc<br/>(chuyển khoản / POS tại showroom)"]
     C --> D["Sales soạn hợp đồng mua bán,<br/>gửi khách xem trước"]
@@ -147,6 +147,7 @@ flowchart TD
   <!-- ===================== DỮ LIỆU ===================== -->
   <section>
     <h2>Dữ liệu chính</h2>
+    <h3 class="tbl-title"><span class="code">orders</span><span class="note">Mỗi dòng là một đơn hàng đã phát sinh đặt cọc</span></h3>
     <div class="tbl-scroll">
       <table>
         <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
@@ -163,8 +164,7 @@ flowchart TD
       </table>
     </div>
 
-    <h3 style="margin:26px 0 0"><code>contracts</code> — hợp đồng mua bán</h3>
-    <p class="rd" style="margin:6px 0 12px">Chứng từ pháp lý của từng đơn hàng, tách riêng khỏi <code>internal_documents</code> (kho tài liệu tư vấn dùng chung). Mỗi đơn hàng đã ký sinh đúng một hợp đồng — quan hệ <b>1 – 1</b>.</p>
+    <h3 class="tbl-title"><span class="code">contracts</span><span class="note">Hợp đồng mua bán — mỗi đơn hàng đã ký sinh đúng một hợp đồng</span></h3>
     <div class="tbl-scroll">
       <table>
         <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
@@ -198,7 +198,7 @@ flowchart TD
       <h3>Điểm cần lưu ý khi trình bày module này</h3>
       <ul>
         <li>Điểm bắt đầu là khách đã đồng ý mua xe ở module Tư vấn · báo giá — module này không lặp lại bước tư vấn, chỉ xử lý phần đặt cọc, hợp đồng, bàn giao.</li>
-        <li>Nhánh "khách không đặt cọc" không phải lỗi hệ thống mà là khách đổi ý; hồ sơ được chuyển lại Nuôi dưỡng khách hàng thay vì đóng hẳn.</li>
+        <li>Nhánh "khách không đặt cọc" không phải lỗi hệ thống mà là khách đổi ý; hồ sơ được chuyển lại Chăm sóc khách hàng thay vì đóng hẳn.</li>
         <li>Bàn giao xe chỉ được xem là hoàn tất khi đủ 3 điều kiện: kiểm tra xe, hướng dẫn sử dụng, giấy tờ đăng ký — thiếu một trong ba, đơn hàng vẫn giữ trạng thái "Chờ giao xe".</li>
       </ul>
     </div>

@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trình soạn ERD — thêm bảng · thuộc tính · quan hệ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0d0f; --panel:#141419; --panel-2:#1a1a20; --line:#282830;
+    --ink:#f2f2f4; --dim:#9aa0a8; --dim-2:#6f757d; --label:#9aa0a8;
+    --accent:#2076b8; --accent-soft:rgba(32,118,184,.18); --accent-ink:#8fc4ec;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+
+  /* ---------- thanh công cụ ---------- */
+  .toolbar{position:sticky;top:0;z-index:30;display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+    padding:12px 18px;background:rgba(13,13,15,.9);backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
+  .toolbar .brand{font-weight:700;font-size:15px;margin-right:auto;line-height:1.3}
+  .toolbar .brand small{display:block;font-weight:400;font-size:11.5px;color:var(--label)}
+  button.tb{font:inherit;font-size:13px;font-weight:500;color:var(--ink);background:#1e1e24;
+    border:1px solid #33333b;border-radius:8px;padding:7px 12px;cursor:pointer;transition:.14s}
+  button.tb:hover{background:#2a2a33;border-color:#4a4a55}
+  button.tb.acc{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink)}
+  button.tb.danger:hover{background:#4a1f1f;border-color:#8a3a3a}
+  .save-msg{min-width:150px;font-size:12px;color:var(--dim);line-height:1.35}
+  .save-msg.ok{color:#74dcae}
+  .save-msg.err{color:#e2a88f}
+
+  /* ---------- bố cục ---------- */
+  .app{display:flex;align-items:stretch;height:calc(100vh - 57px)}
+  .stage{flex:1;overflow:auto;padding:18px;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.045) 1px,transparent 0);background-size:20px 20px}
+  .side{width:352px;flex:0 0 352px;overflow-y:auto;border-left:1px solid var(--line);background:#0f0f12;padding:14px}
+
+  /* ---------- SVG: giữ y hệt sơ đồ gốc ---------- */
+  svg#erd{display:block;background:transparent;touch-action:none}
+  svg#erd text{font-family:'Inter',system-ui,sans-serif;user-select:none}
+  svg#erd .tname{font-size:13.5px;font-weight:700}
+  svg#erd .fname{font-size:11.5px;fill:#e8e8ec}
+  svg#erd .ftype{fill:#868c95}
+  svg#erd .rel{font-size:11.5px;fill:var(--label);font-weight:500}
+  svg#erd .tnote{font-size:10.5px;fill:var(--label);font-style:italic}
+  svg#erd .tbl{cursor:grab}
+  svg#erd .tbl.sel .frame{stroke-width:2.2;stroke-opacity:1}
+  svg#erd .hit{fill:transparent}
+  svg#erd .lnk{cursor:pointer}
+  svg#erd .lnk.sel .wire{stroke-width:2.9;opacity:1}
+
+  /* tay cầm co giãn mũi tên */
+  svg#erd .h-wp{fill:#8fc4ec;stroke:#0d0d0f;stroke-width:1.6;cursor:move}
+  svg#erd .h-wp:hover{fill:#fff}
+  svg#erd .h-anc{fill:#141419;stroke:#8fc4ec;stroke-width:2;cursor:move}
+  svg#erd .h-anc:hover{fill:#8fc4ec}
+  svg#erd .h-lbl{fill:rgba(143,196,236,.16);stroke:#8fc4ec;stroke-width:1;stroke-dasharray:3 2;cursor:move}
+  svg#erd .h-ghost{fill:none;stroke:#8fc4ec;stroke-width:1;stroke-dasharray:4 3;opacity:.5}
+
+  /* ---------- panel bên phải ---------- */
+  .grp{border:1px solid var(--line);border-radius:11px;background:var(--panel);margin-bottom:12px;overflow:hidden}
+  .grp>h3{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--dim-2);
+    margin:0;padding:10px 13px;background:#101014;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:8px}
+  .grp>h3 .sp{margin-left:auto}
+  .grp .body{padding:11px 13px}
+  .row{display:flex;gap:7px;align-items:center;margin-bottom:7px}
+  .row:last-child{margin-bottom:0}
+  label.lb{font-size:11.5px;color:var(--dim-2);width:62px;flex:0 0 62px}
+  input.f,select.f,textarea.f{font:inherit;font-size:12.7px;color:var(--ink);background:#101014;
+    border:1px solid var(--line);border-radius:7px;padding:6px 9px;width:100%;min-width:0}
+  input.f:focus,select.f:focus,textarea.f:focus{outline:none;border-color:var(--accent)}
+  textarea.f{resize:vertical;min-height:52px;line-height:1.45}
+  .mini{font:inherit;font-size:11.5px;color:var(--ink);background:#1e1e24;border:1px solid #33333b;
+    border-radius:6px;padding:4px 8px;cursor:pointer;flex:0 0 auto;transition:.14s}
+  .mini:hover{background:#2a2a33;border-color:#4a4a55}
+  .mini.x:hover{background:#4a1f1f;border-color:#8a3a3a}
+
+  .item{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;cursor:pointer;
+    font-size:12.7px;border:1px solid transparent}
+  .item:hover{background:var(--panel-2)}
+  .item.on{background:var(--accent-soft);border-color:var(--accent)}
+  .item .dot{width:11px;height:11px;border-radius:4px;flex:0 0 auto;border:1px solid}
+  .item .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+  .item .cnt{font-size:10.5px;color:var(--dim-2)}
+
+  .tones{display:flex;gap:7px;flex-wrap:wrap}
+  .tone{width:32px;height:26px;border-radius:7px;cursor:pointer;border:2px solid;position:relative;transition:.14s}
+  .tone:hover{transform:translateY(-1px)}
+  .tone.on::after{content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700}
+
+  .fld{display:flex;gap:5px;align-items:center;margin-bottom:5px}
+  .fld input{font:inherit;font-size:12px;color:var(--ink);background:#101014;border:1px solid var(--line);
+    border-radius:6px;padding:5px 7px;min-width:0}
+  .fld input.n{flex:1.35}
+  .fld input.t{flex:1}
+  .fld input:focus{outline:none;border-color:var(--accent)}
+  .fld .g{cursor:pointer;color:var(--dim-2);font-size:12px;padding:0 2px;flex:0 0 auto;user-select:none}
+
+  .tip{font-size:11.4px;color:var(--dim);line-height:1.55;margin:0 0 9px;
+    background:#101014;border:1px solid var(--line);border-left:2px solid var(--accent);
+    border-radius:0 7px 7px 0;padding:8px 10px}
+  .tip b{color:var(--accent-ink);font-weight:600}
+  .empty{font-size:12px;color:var(--dim-2);font-style:italic;padding:4px 2px}
+
+  dialog.out{border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--ink);
+    padding:0;width:min(920px,92vw);max-height:86vh}
+  dialog.out::backdrop{background:rgba(0,0,0,.6)}
+  dialog.out header{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line)}
+  dialog.out header b{font-size:14.5px}
+  dialog.out .bd{padding:14px 16px;overflow:auto;max-height:64vh}
+  dialog.out pre{margin:0;font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:12px;
+    line-height:1.55;background:#0a0a0c;border:1px solid var(--line);border-radius:9px;padding:13px;
+    overflow:auto;white-space:pre;color:#dfe3e8}
+  dialog.out .steps{font-size:12.5px;color:var(--dim);line-height:1.6;margin:0 0 12px}
+  dialog.out .steps code{font-family:ui-monospace,Consolas,monospace;font-size:11.6px;color:var(--accent-ink);
+    background:#101014;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="brand">Trình soạn ERD<small>Kéo bảng để xếp chỗ · chọn mũi tên để hiện tay cầm co giãn · nháy đúp lên nét để thêm điểm uốn</small></div>
+  <button class="tb" id="btAddTable">＋ Bảng</button>
+  <button class="tb" id="btAddLink">＋ Quan hệ</button>
+  <button class="tb acc" id="btSaveTarget">Lưu vào sơ đồ tổng</button>
+  <button class="tb" id="btExport">⤓ Xuất code</button>
+  <button class="tb" id="btImport">⤒ Nhập</button>
+  <button class="tb danger" id="btReset">↺ Về bản gốc</button>
+  <span class="save-msg" id="saveMsg" aria-live="polite"></span>
+</div>
+
+<div class="app">
+  <div class="stage"><svg id="erd" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <aside class="side" id="side"></aside>
+</div>
+
+<dialog class="out" id="dlg">
+  <header>
+    <b id="dlgTitle">Code để dán vào so-do-crm-actor-v2.html</b>
+    <span style="margin-left:auto"></span>
+    <button class="tb" id="btCopy">Sao chép</button>
+    <button class="tb" id="btClose">Đóng</button>
+  </header>
+  <div class="bd">
+    <p class="steps" id="dlgSteps"></p>
+    <pre id="dlgCode"></pre>
+    <textarea class="f" id="dlgIn" style="display:none;min-height:260px;font-family:ui-monospace,Consolas,monospace;font-size:12px"></textarea>
+  </div>
+</dialog>
+
+<script>
+(function(){
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════
+   1. HẰNG SỐ VẼ — phải trùng khít với so-do-crm-actor-v2.html
+   ══════════════════════════════════════════════════════════════ */
+const HDR = 32, ROW = 27, PAD = 13;
+const GRID = 5;     // bước canh lưới
+const R    = 10;    // bán kính bo góc đường nối
+const GAP  = 6;     // khoảng hở chừa cho đầu mũi tên ở phía bảng con
+const EDGE = 14;    // chừa mép khi tự chọn chỗ neo
+
+const TONE = {
+  teal  :{ hd:'#0d4b39', bd:'#1a916c', tt:'#74dcae' },
+  blue  :{ hd:'#123b5e', bd:'#2076b8', tt:'#8fc4ec' },
+  rust  :{ hd:'#5f2a18', bd:'#a04a2a', tt:'#e2a88f' },
+  purple:{ hd:'#3a2b6d', bd:'#5b45a6', tt:'#bcaef0' },
+  amber :{ hd:'#5a3a10', bd:'#c8922e', tt:'#f0c674' },
+  sky   :{ hd:'#0e3d52', bd:'#2b8fb5', tt:'#8ad3ee' }
+};
+const TONE_KEYS = Object.keys(TONE);
+const SIDE_VN = { r:'phải', l:'trái', t:'trên', b:'dưới' };
+
+const esc2  = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const f2    = n => Math.round(n*10)/10;
+const snap  = n => Math.round(n/GRID)*GRID;
+const cl01  = n => Math.max(0, Math.min(1, n));
+const near  = (a,b) => Math.abs(a-b) < 0.5;
+
+/* ══════════════════════════════════════════════════════════════
+   2. DỮ LIỆU GỐC — chép nguyên từ sơ đồ hiện tại.
+   Các chuỗi d viết tay được nạp một lần rồi tách thành
+   neo + điểm uốn, nên hình dạng giữ nguyên mà vẫn kéo được.
+   ══════════════════════════════════════════════════════════════ */
+function seed(){ return {
+  VW:1250, VH:1000,
+  tables:[
+    { name:'showrooms', tone:'teal', x:350, y:16, w:210, fields:[
+      ['mã showroom','uuid · PK'],
+      ['tên showroom','string']
+    ], note:[] },
+    { name:'employees', tone:'blue', x:20, y:230, w:235, fields:[
+      ['mã nhân viên','uuid · PK'],
+      ['họ tên','string'],
+      ['email','string'],
+      ['số điện thoại','string'],
+      ['mã showroom','uuid · FK']
+    ], note:[] },
+    { name:'customers', tone:'blue', x:330, y:170, w:255, fields:[
+      ['mã khách hàng','uuid · PK'],
+      ['họ tên','string'],
+      ['số điện thoại','string'],
+      ['email','string'],
+      ['model xe quan tâm','string'],
+      ['mã showroom','uuid · FK'],
+      ['thời gian mong muốn','datetime'],
+      ['thời gian xác nhận','datetime'],
+      ['trạng thái','enum'],
+      ['mã nhân viên phụ trách','uuid · FK'],
+      ['kênh đăng ký','enum']
+    ], note:[] },
+    { name:'orders', tone:'amber', x:330, y:560, w:250, fields:[
+      ['mã đơn hàng','uuid · PK'],
+      ['mã khách hàng','uuid · FK'],
+      ['mã nhân viên','uuid · FK'],
+      ['mã showroom','uuid · FK'],
+      ['mã xe','uuid · FK'],
+      ['tổng giá trị','decimal'],
+      ['tiền đặt cọc','decimal'],
+      ['ngày đặt cọc','datetime'],
+      ['ngày bàn giao','datetime'],
+      ['trạng thái','enum']
+    ], note:['chỉ tạo khi khách đã đặt cọc','trạng thái: đã cọc → đã ký HĐ → đã chốt deal'] },
+    { name:'contracts', tone:'amber', x:700, y:720, w:235, fields:[
+      ['mã hợp đồng','uuid · PK'],
+      ['mã đơn hàng','uuid · FK'],
+      ['số hợp đồng','string'],
+      ['ngày ký','datetime'],
+      ['đường dẫn file','string']
+    ], note:[] },
+    { name:'internal_documents', tone:'rust', x:700, y:100, w:235, fields:[
+      ['mã tài liệu','uuid · PK'],
+      ['nhãn phân loại','enum'],
+      ['tên tài liệu','string'],
+      ['đường dẫn','string']
+    ], note:['tài liệu phục vụ tư vấn · báo giá','(brochure, bảng giá, chính sách)'] },
+    { name:'models', tone:'purple', x:700, y:560, w:195, fields:[
+      ['mã xe','uuid · PK'],
+      ['tên xe','string']
+    ], note:['nguồn dữ liệu đổ vào dropdown','chọn xe trên form đăng ký'] },
+    { name:'driving_hours', tone:'purple', x:40, y:700, w:195, fields:[
+      ['giờ lái','time · PK']
+    ], note:['nguồn dữ liệu đổ vào dropdown','chọn giờ trên form đăng ký'] },
+    { name:'telegram_messages', tone:'sky', x:985, y:400, w:245, fields:[
+      ['mã tin nhắn','uuid · PK'],
+      ['mã khách hàng','uuid · FK'],
+      ['mã nhân viên','uuid · FK'],
+      ['chiều','enum'],
+      ['nội dung','text'],
+      ['telegram message id','bigint'],
+      ['thời gian','datetime']
+    ], note:['chiều: in (khách gửi) · out (bot hoặc sales gửi)','mã nhân viên rỗng = tin do bot tự động gửi'] }
+  ],
+  links:[
+    { from:'showrooms', to:'employees', c:'#1a916c',
+      d:'M350,59 H147 Q137,59 137,69 V224' },
+    { from:'showrooms', to:'customers', c:'#1a916c', anchor:'start',
+      d:'M455,102 V164' },
+    { from:'showrooms', to:'orders', c:'#1a916c', anchor:'start',
+      d:'M560,59 H660 Q670,59 670,69 V530 Q670,540 660,540 H545 Q535,540 535,550 V554' },
+    { from:'employees', to:'customers', c:'#2076b8',
+      d:'M255,313 H324' },
+    { from:'employees', to:'orders', c:'#2076b8',
+      d:'M137,397 V610 Q137,620 147,620 H324' },
+    { from:'customers', to:'orders', c:'#2076b8', anchor:'start',
+      d:'M455,499 V554' },
+    { from:'models', to:'orders', c:'#5b45a6',
+      d:'M700,603 H584' },
+    { from:'orders', to:'contracts', c:'#c8922e', lbl:'1 – 1',
+      d:'M580,803 H694' },
+    { from:'customers', to:'telegram_messages', c:'#2b8fb5',
+      d:'M585,470 H981' },
+    { from:'employees', to:'telegram_messages', c:'#2b8fb5',
+      d:'M20,350 H16 Q6,350 6,360 V940 Q6,950 16,950 H950 Q970,950 970,930 V590 Q970,580 980,580 H981' }
+  ]
+};}
+
+/* ══════════════════════════════════════════════════════════════
+   3. TRẠNG THÁI
+   ══════════════════════════════════════════════════════════════ */
+const KEY = 'erd_editor_v2';
+let S = load();
+let sel = { kind:null, i:-1 };
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      const o = JSON.parse(raw);
+      if(o && Array.isArray(o.tables) && Array.isArray(o.links)) return migrate(o);
+    }
+  }catch(e){}
+  return migrate(seed());
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+const tblH   = t => HDR + t.fields.length * ROW;
+const byName = n => S.tables.find(t => t.name === n);
+const rectOf = t => ({ x:t.x, y:t.y, w:t.w, h:tblH(t) });
+
+/* ══════════════════════════════════════════════════════════════
+   4. HÌNH HỌC ĐƯỜNG NỐI
+
+   Mỗi quan hệ được mô tả bằng:
+     a   — neo trên bảng cha  {side, t, gap}
+     b   — neo trên bảng con  {side, t, gap}
+     pts — các điểm uốn ở giữa, toạ độ tuyệt đối, kéo được
+
+   side  : cạnh nào của khung (r/l/t/b)
+   t     : vị trí dọc theo cạnh đó, 0…1 — nhờ vậy neo bám theo
+           khi bảng đổi chỗ, đổi bề rộng hay thêm bớt thuộc tính
+   gap   : hở ra ngoài cạnh bao nhiêu px (chừa chỗ cho đầu mũi tên)
+   ══════════════════════════════════════════════════════════════ */
+
+/** Toạ độ thật của một neo. */
+function ancPt(rc, a){
+  switch(a.side){
+    case 'r': return { x:rc.x + rc.w + a.gap, y:rc.y + a.t * rc.h };
+    case 'l': return { x:rc.x - a.gap,        y:rc.y + a.t * rc.h };
+    case 'b': return { x:rc.x + a.t * rc.w,   y:rc.y + rc.h + a.gap };
+    default : return { x:rc.x + a.t * rc.w,   y:rc.y - a.gap };
+  }
+}
+/** Đường rời/vào neo là ngang hay dọc. */
+const ancDir = a => (a.side === 'r' || a.side === 'l') ? 'h' : 'v';
+
+/** Cạnh gần nhất của khung so với một điểm — dùng khi kéo neo và khi nạp d cũ. */
+function ancFrom(pt, rc){
+  const dl = Math.abs(pt.x - rc.x),          dr = Math.abs(pt.x - (rc.x + rc.w));
+  const dt = Math.abs(pt.y - rc.y),          db = Math.abs(pt.y - (rc.y + rc.h));
+  const m  = Math.min(dl, dr, dt, db);
+  if(m === dr) return { side:'r', t:cl01((pt.y - rc.y)/rc.h), gap:Math.round(pt.x - (rc.x + rc.w)) };
+  if(m === dl) return { side:'l', t:cl01((pt.y - rc.y)/rc.h), gap:Math.round(rc.x - pt.x) };
+  if(m === db) return { side:'b', t:cl01((pt.x - rc.x)/rc.w), gap:Math.round(pt.y - (rc.y + rc.h)) };
+  return         { side:'t', t:cl01((pt.x - rc.x)/rc.w), gap:Math.round(rc.y - pt.y) };
+}
+
+/** Tách chuỗi SVG path thành [điểm đầu, …điểm uốn, điểm cuối].
+    Góc thật nằm ở điểm điều khiển của lệnh Q, nên chỉ lấy các điểm đó. */
+function parseD(d){
+  const segs = String(d).match(/[MHVQL][^MHVQL]*/g) || [];
+  let cur = { x:0, y:0 };
+  const pts = [];
+  segs.forEach(s => {
+    const k = s[0], n = (s.slice(1).match(/-?[\d.]+/g) || []).map(Number);
+    if(k === 'M'){ cur = { x:n[0], y:n[1] }; pts.push({ ...cur }); }
+    else if(k === 'H'){ cur = { x:n[0], y:cur.y }; }
+    else if(k === 'V'){ cur = { x:cur.x, y:n[0] }; }
+    else if(k === 'L'){ cur = { x:n[0], y:n[1] }; }
+    else if(k === 'Q'){ pts.push({ x:n[0], y:n[1] }); cur = { x:n[2], y:n[3] }; }
+  });
+  pts.push({ ...cur });
+  return pts;
+}
+
+/** Nạp dữ liệu cũ: đổi mọi chuỗi d thành neo + điểm uốn. */
+function migrate(o){
+  o.links.forEach(l => {
+    if(l.a && l.b && Array.isArray(l.pts)) return;
+    const A = o.tables.find(t => t.name === l.from);
+    const B = o.tables.find(t => t.name === l.to);
+    const rA = A && { x:A.x, y:A.y, w:A.w, h:HDR + A.fields.length*ROW };
+    const rB = B && { x:B.x, y:B.y, w:B.w, h:HDR + B.fields.length*ROW };
+    if(l.d && rA && rB){
+      const P = parseD(l.d);
+      l.a   = ancFrom(P[0], rA);
+      l.b   = ancFrom(P[P.length-1], rB);
+      l.pts = P.slice(1, -1);
+    }else if(rA && rB){
+      Object.assign(l, autoAnc(rA, rB));
+    }else{
+      l.a = { side:'r', t:.5, gap:0 }; l.b = { side:'l', t:.5, gap:GAP }; l.pts = [];
+    }
+    delete l.d; delete l.lx; delete l.ly; delete l.manual;
+  });
+  return o;
+}
+
+/** Tự chọn cặp neo hợp lý nhất cho hai khung. */
+function autoAnc(A, B){
+  const ac = { x:A.x + A.w/2, y:A.y + A.h/2 };
+  const bc = { x:B.x + B.w/2, y:B.y + B.h/2 };
+  const dx = bc.x - ac.x, dy = bc.y - ac.y;
+  const gapX = dx > 0 ? B.x - (A.x + A.w) : A.x - (B.x + B.w);
+  const gapY = dy > 0 ? B.y - (A.y + A.h) : A.y - (B.y + B.h);
+
+  if(gapX >= gapY){
+    const sSide = dx > 0 ? 'r' : 'l', tSide = dx > 0 ? 'l' : 'r';
+    const lo = Math.max(A.y + EDGE, B.y + EDGE), hi = Math.min(A.y + A.h - EDGE, B.y + B.h - EDGE);
+    if(lo <= hi){                                   // có dải chồng nhau → kẻ thẳng một nét
+      const y = Math.min(Math.max((ac.y + bc.y)/2, lo), hi);
+      return { a:{ side:sSide, t:cl01((y - A.y)/A.h), gap:0 },
+               b:{ side:tSide, t:cl01((y - B.y)/B.h), gap:GAP }, pts:[] };
+    }
+    return { a:{ side:sSide, t:.5, gap:0 }, b:{ side:tSide, t:.5, gap:GAP }, pts:[] };
+  }
+
+  const sSide = dy > 0 ? 'b' : 't', tSide = dy > 0 ? 't' : 'b';
+  const lo = Math.max(A.x + EDGE, B.x + EDGE), hi = Math.min(A.x + A.w - EDGE, B.x + B.w - EDGE);
+  if(lo <= hi){
+    const x = Math.min(Math.max((ac.x + bc.x)/2, lo), hi);
+    return { a:{ side:sSide, t:cl01((x - A.x)/A.w), gap:0 },
+             b:{ side:tSide, t:cl01((x - B.x)/B.w), gap:GAP }, pts:[] };
+  }
+  return { a:{ side:sSide, t:.5, gap:0 }, b:{ side:tSide, t:.5, gap:GAP }, pts:[] };
+}
+
+/** Chèn khuỷu để hai điểm liên tiếp luôn nối bằng các đoạn vuông góc. */
+function elbow(p, q, dIn, dOut){
+  const sx = near(p.x, q.x), sy = near(p.y, q.y);
+  if(sx && sy) return { e:[], dir:dIn };
+
+  if(dOut){                                   // chặng cuối: phải vào neo đúng hướng
+    if(dIn === 'h' && dOut === 'h'){
+      if(sy) return { e:[], dir:'h' };
+      const m = (p.x + q.x)/2;
+      return { e:[{ x:m, y:p.y }, { x:m, y:q.y }], dir:'h' };
+    }
+    if(dIn === 'v' && dOut === 'v'){
+      if(sx) return { e:[], dir:'v' };
+      const m = (p.y + q.y)/2;
+      return { e:[{ x:p.x, y:m }, { x:q.x, y:m }], dir:'v' };
+    }
+    if(dIn === 'h'){                          // h → v
+      if(sx) return { e:[], dir:'v' };
+      if(sy) return { e:[], dir:'h' };
+      return { e:[{ x:q.x, y:p.y }], dir:'v' };
+    }
+    if(sy) return { e:[], dir:'h' };          // v → h
+    if(sx) return { e:[], dir:'v' };
+    return { e:[{ x:p.x, y:q.y }], dir:'h' };
+  }
+
+  if(dIn === 'h'){                            // chặng giữa: đi theo hướng đang có trước
+    if(sy) return { e:[], dir:'h' };
+    if(sx) return { e:[], dir:'v' };
+    return { e:[{ x:q.x, y:p.y }], dir:'v' };
+  }
+  if(sx) return { e:[], dir:'v' };
+  if(sy) return { e:[], dir:'h' };
+  return { e:[{ x:p.x, y:q.y }], dir:'h' };
+}
+
+/** Danh sách góc của đường, đã vuông góc hoá. */
+function cornersOf(P, dS, dE){
+  const out = [P[0]];
+  let cur = P[0], dir = dS;
+  for(let i = 1; i < P.length; i++){
+    const q = P[i], last = i === P.length - 1;
+    const r = elbow(cur, q, dir, last ? dE : null);
+    r.e.forEach(p => out.push(p));
+    out.push(q);
+    dir = r.dir; cur = q;
+  }
+  // bỏ điểm trùng nhau
+  return out.filter((p, i) => i === 0 || !(near(p.x, out[i-1].x) && near(p.y, out[i-1].y)));
+}
+
+const dist   = (a,b) => Math.hypot(b.x - a.x, b.y - a.y);
+const toward = (c,p,r) => { const d = dist(c,p) || 1; return { x:c.x + (p.x-c.x)*r/d, y:c.y + (p.y-c.y)*r/d }; };
+
+/** Vẽ đường qua danh sách góc, bo tròn bán kính R.
+    Dùng H/V cho đoạn thẳng để chuỗi d xuất ra giống hệt bản gốc. */
+function roundPath(C){
+  if(C.length < 2) return 'M0,0';
+  const seg = (from, to) => {
+    if(near(from.x, to.x) && near(from.y, to.y)) return '';
+    if(near(from.y, to.y)) return ` H${f2(to.x)}`;
+    if(near(from.x, to.x)) return ` V${f2(to.y)}`;
+    return ` L${f2(to.x)},${f2(to.y)}`;
+  };
+  let d = `M${f2(C[0].x)},${f2(C[0].y)}`, cur = C[0];
+  for(let i = 1; i < C.length - 1; i++){
+    const c = C[i], n = C[i+1];
+    const r = Math.max(0, Math.min(R, dist(cur, c)/2, dist(c, n)/2));
+    if(r < .5){ d += seg(cur, c); cur = c; continue; }
+    const a = toward(c, cur, r), b = toward(c, n, r);
+    d += seg(cur, a) + ` Q${f2(c.x)},${f2(c.y)} ${f2(b.x)},${f2(b.y)}`;
+    cur = b;
+  }
+  d += seg(cur, C[C.length-1]);
+  return d;
+}
+
+/** Điểm giữa đường, tính trực tiếp trên polyline — không cần đo bằng DOM. */
+function midOf(C){
+  let total = 0;
+  for(let i = 1; i < C.length; i++) total += dist(C[i-1], C[i]);
+  let want = total/2;
+  for(let i = 1; i < C.length; i++){
+    const d = dist(C[i-1], C[i]);
+    if(want <= d){
+      const k = d ? want/d : 0;
+      return { x:C[i-1].x + (C[i].x - C[i-1].x)*k, y:C[i-1].y + (C[i].y - C[i-1].y)*k };
+    }
+    want -= d;
+  }
+  return C[C.length-1];
+}
+
+/** Toàn bộ hình học của một quan hệ, tính lại mỗi lần vẽ → luôn dính bảng. */
+function geom(l){
+  const A = byName(l.from), B = byName(l.to);
+  if(!A || !B) return null;
+  const rA = rectOf(A), rB = rectOf(B);
+  const p0 = ancPt(rA, l.a), pN = ancPt(rB, l.b);
+  const P  = [p0, ...(l.pts || []), pN];
+  const C  = cornersOf(P, ancDir(l.a), ancDir(l.b));
+  const m  = midOf(C);
+  const lo = l.lo || { dx:0, dy:-8 };
+  return { rA, rB, p0, pN, C, d:roundPath(C),
+           lx:Math.round(m.x + lo.dx), ly:Math.round(m.y + lo.dy) };
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. VẼ — thuật toán y hệt file gốc, thêm lớp tay cầm
+   ══════════════════════════════════════════════════════════════ */
+const svg = document.getElementById('erd');
+let G = [];                                   // hình học đã tính, dùng lại cho thao tác chuột
+
+function render(){
+  G = S.links.map(geom);
+
+  const colors = [...new Set(S.links.map(l => l.c))];
+  let defs = '';
+  colors.forEach((c,i) => {
+    defs += `<marker id="erd-ah${i}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
+      orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="${c}" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round"/></marker>`;
+  });
+  const mk = c => `erd-ah${colors.indexOf(c)}`;
+
+  let body = '';
+
+  // ── đường nối nằm dưới bảng
+  S.links.forEach((l, i) => {
+    const g = G[i]; if(!g) return;
+    const on = sel.kind === 'link' && sel.i === i ? ' sel' : '';
+    body += `<g class="lnk${on}" data-link="${i}">`
+         +  `<path class="wire" d="${g.d}" fill="none" stroke="${l.c}" stroke-width="1.7" opacity=".8"`
+         +  ` marker-end="url(#${mk(l.c)})"/>`
+         +  `<path d="${g.d}" fill="none" stroke="transparent" stroke-width="14"/>`
+         +  `<text class="rel" x="${g.lx}" y="${g.ly}" text-anchor="${l.anchor||'middle'}">${esc2(l.lbl||'1 – n')}</text>`
+         +  `</g>`;
+  });
+
+  // ── các bảng
+  S.tables.forEach((t, i) => {
+    const tn = TONE[t.tone] || TONE.blue, h = tblH(t);
+    const on = sel.kind === 'table' && sel.i === i ? ' sel' : '';
+    body += `<g class="tbl${on}" data-tbl="${i}">`;
+    body += `<rect class="frame" x="${t.x}" y="${t.y}" width="${t.w}" height="${h}" rx="9"
+      fill="#141419" stroke="${tn.bd}" stroke-opacity=".5"/>`;
+    body += `<path d="M${t.x},${t.y+9} Q${t.x},${t.y} ${t.x+9},${t.y} H${t.x+t.w-9}
+      Q${t.x+t.w},${t.y} ${t.x+t.w},${t.y+9} V${t.y+HDR} H${t.x} Z"
+      fill="${tn.hd}" stroke="${tn.bd}" stroke-opacity=".85"/>`;
+    body += `<text class="tname" x="${t.x + t.w/2}" y="${t.y + HDR/2 + 4.5}"
+      text-anchor="middle" fill="${tn.tt}">${esc2(t.name)}</text>`;
+    t.fields.forEach((fd, k) => {
+      const ry = t.y + HDR + k * ROW;
+      if(k) body += `<line x1="${t.x+1}" y1="${ry}" x2="${t.x+t.w-1}" y2="${ry}"
+        stroke="#2a2a32" stroke-width="1"/>`;
+      body += `<text class="fname" x="${t.x + PAD}" y="${ry + ROW/2 + 4}">${esc2(fd[0])}<tspan
+        class="ftype"> · ${esc2(fd[1])}</tspan></text>`;
+    });
+    (t.note || []).forEach((ln, k) => {
+      body += `<text class="tnote" x="${t.x + t.w/2}" y="${t.y + h + 17 + k*14}"
+        text-anchor="middle">${esc2(ln)}</text>`;
+    });
+    body += `<rect class="hit" x="${t.x}" y="${t.y}" width="${t.w}" height="${h}"/>`;
+    body += `</g>`;
+  });
+
+  // ── tay cầm co giãn của quan hệ đang chọn, vẽ trên cùng
+  if(sel.kind === 'link' && G[sel.i]){
+    const l = S.links[sel.i], g = G[sel.i];
+    body += `<g class="handles">`;
+    body += `<path class="h-ghost" d="${g.d}" fill="none"/>`;
+    (l.pts || []).forEach((p, k) => {
+      body += `<circle class="h-wp" data-wp="${k}" cx="${p.x}" cy="${p.y}" r="5.5"/>`;
+    });
+    body += `<circle class="h-anc" data-anc="a" cx="${g.p0.x}" cy="${g.p0.y}" r="5"/>`;
+    body += `<circle class="h-anc" data-anc="b" cx="${g.pN.x}" cy="${g.pN.y}" r="5"/>`;
+    body += `<rect class="h-lbl" data-lbl="1" x="${g.lx - 26}" y="${g.ly - 12}" width="52" height="16" rx="4"/>`;
+    body += `</g>`;
+  }
+
+  svg.setAttribute('viewBox', `0 0 ${S.VW} ${S.VH}`);
+  svg.setAttribute('width',  S.VW);
+  svg.setAttribute('height', S.VH);
+  svg.innerHTML = `<defs>${defs}</defs>${body}`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   6. CHUỘT — kéo bảng, kéo điểm uốn, kéo neo, kéo nhãn
+   ══════════════════════════════════════════════════════════════ */
+let drag = null;
+
+function toSvg(ev){
+  const m = svg.getScreenCTM();
+  if(!m) return { x:0, y:0 };
+  const p = svg.createSVGPoint();
+  p.x = ev.clientX; p.y = ev.clientY;
+  return p.matrixTransform(m.inverse());
+}
+
+svg.addEventListener('pointerdown', ev => {
+  const el = ev.target;
+  const p  = toSvg(ev);
+
+  // ── tay cầm: điểm uốn
+  if(el.dataset && el.dataset.wp !== undefined){
+    drag = { type:'wp', k:+el.dataset.wp };
+    svg.setPointerCapture(ev.pointerId); ev.preventDefault(); return;
+  }
+  // ── tay cầm: neo hai đầu
+  if(el.dataset && el.dataset.anc){
+    drag = { type:'anc', end:el.dataset.anc };
+    svg.setPointerCapture(ev.pointerId); ev.preventDefault(); return;
+  }
+  // ── tay cầm: nhãn
+  if(el.dataset && el.dataset.lbl){
+    const l = S.links[sel.i], g = G[sel.i];
+    drag = { type:'lbl', ox:p.x - g.lx, oy:p.y - g.ly, base:l.lo || { dx:0, dy:-8 }, gx:g.lx, gy:g.ly };
+    svg.setPointerCapture(ev.pointerId); ev.preventDefault(); return;
+  }
+
+  const gt = el.closest('.tbl'), gl = el.closest('.lnk');
+  if(gt){
+    const i = +gt.dataset.tbl, t = S.tables[i];
+    drag = { type:'tbl', i, ox:p.x - t.x, oy:p.y - t.y, moved:false };
+    svg.setPointerCapture(ev.pointerId);
+    pick('table', i); ev.preventDefault();
+  }else if(gl){
+    pick('link', +gl.dataset.link);
+  }else{
+    pick(null, -1);
+  }
+});
+
+svg.addEventListener('pointermove', ev => {
+  if(!drag) return;
+  const p = toSvg(ev);
+
+  if(drag.type === 'tbl'){
+    const t = S.tables[drag.i];
+    const nx = Math.max(0, snap(p.x - drag.ox)), ny = Math.max(0, snap(p.y - drag.oy));
+    if(nx === t.x && ny === t.y) return;
+    t.x = nx; t.y = ny; drag.moved = true;
+    render(); return;                       // neo tính lại → mũi tên bám theo, đoạn giữa co giãn
+  }
+
+  if(drag.type === 'wp'){
+    const l = S.links[sel.i];
+    l.pts[drag.k] = { x:snap(p.x), y:snap(p.y) };
+    drag.moved = true; render(); return;
+  }
+
+  if(drag.type === 'anc'){
+    const l  = S.links[sel.i];
+    const rc = drag.end === 'a' ? G[sel.i].rA : G[sel.i].rB;
+    const cur = l[drag.end];
+    const na = ancFrom(p, rc);
+    na.gap = cur.gap;                       // giữ nguyên khoảng hở đầu mũi tên
+    l[drag.end] = na;
+    drag.moved = true; render(); return;
+  }
+
+  if(drag.type === 'lbl'){
+    const l = S.links[sel.i];
+    l.lo = { dx:Math.round(drag.base.dx + (p.x - drag.ox) - drag.gx),
+             dy:Math.round(drag.base.dy + (p.y - drag.oy) - drag.gy) };
+    drag.moved = true; render(); return;
+  }
+});
+
+svg.addEventListener('pointerup', ev => {
+  if(!drag) return;
+  if(drag.moved){ save(); panel(); }
+  drag = null;
+  try{ svg.releasePointerCapture(ev.pointerId); }catch(e){}
+});
+
+/* nháy đúp: trên điểm uốn thì bỏ điểm đó, trên nét thì chèn điểm mới */
+svg.addEventListener('dblclick', ev => {
+  const el = ev.target;
+  if(el.dataset && el.dataset.wp !== undefined){
+    S.links[sel.i].pts.splice(+el.dataset.wp, 1);
+    save(); render(); panel(); return;
+  }
+  const gl = el.closest('.lnk');
+  if(!gl) return;
+  const i = +gl.dataset.link, l = S.links[i], g = G[i];
+  if(!g) return;
+  const p = toSvg(ev);
+  const P = [g.p0, ...(l.pts || []), g.pN];
+  let best = 0, bd = Infinity;
+  for(let k = 1; k < P.length; k++){
+    const d = distToSeg(p, P[k-1], P[k]);
+    if(d < bd){ bd = d; best = k; }
+  }
+  l.pts = l.pts || [];
+  l.pts.splice(best - 1, 0, { x:snap(p.x), y:snap(p.y) });
+  sel = { kind:'link', i };
+  save(); render(); panel();
+});
+
+function distToSeg(p, a, b){
+  const vx = b.x - a.x, vy = b.y - a.y;
+  const L2 = vx*vx + vy*vy;
+  const t  = L2 ? Math.max(0, Math.min(1, ((p.x-a.x)*vx + (p.y-a.y)*vy)/L2)) : 0;
+  return Math.hypot(p.x - (a.x + t*vx), p.y - (a.y + t*vy));
+}
+
+function pick(kind, i){ sel = { kind, i }; render(); panel(); }
+
+/* ══════════════════════════════════════════════════════════════
+   7. PANEL BÊN PHẢI
+   ══════════════════════════════════════════════════════════════ */
+const side = document.getElementById('side');
+
+function el(html){ const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstElementChild; }
+function group(title, extra){
+  const g = el(`<div class="grp"><h3>${title}${extra||''}</h3><div class="body"></div></div>`);
+  return { root:g, body:g.querySelector('.body') };
+}
+
+function panel(){
+  side.innerHTML = '';
+
+  const gT = group('Bảng dữ liệu', `<span class="sp"></span><span style="font-size:11px;color:var(--dim-2)">${S.tables.length}</span>`);
+  if(!S.tables.length) gT.body.appendChild(el('<div class="empty">Chưa có bảng nào.</div>'));
+  S.tables.forEach((t, i) => {
+    const tn = TONE[t.tone] || TONE.blue;
+    const it = el(`<div class="item${sel.kind==='table'&&sel.i===i?' on':''}">
+        <span class="dot" style="background:${tn.hd};border-color:${tn.bd}"></span>
+        <span class="nm">${esc2(t.name)}</span>
+        <span class="cnt">${t.fields.length} thuộc tính</span></div>`);
+    it.onclick = () => pick('table', i);
+    gT.body.appendChild(it);
+  });
+  side.appendChild(gT.root);
+
+  if(sel.kind === 'table' && S.tables[sel.i]) side.appendChild(tablePanel(S.tables[sel.i], sel.i));
+
+  const gL = group('Quan hệ', `<span class="sp"></span><span style="font-size:11px;color:var(--dim-2)">${S.links.length}</span>`);
+  if(!S.links.length) gL.body.appendChild(el('<div class="empty">Chưa có quan hệ nào.</div>'));
+  S.links.forEach((l, i) => {
+    const n = (l.pts || []).length;
+    const it = el(`<div class="item${sel.kind==='link'&&sel.i===i?' on':''}">
+        <span class="dot" style="background:${l.c};border-color:${l.c}"></span>
+        <span class="nm">${esc2(l.from)} → ${esc2(l.to)}</span>
+        <span class="cnt">${n ? n + ' uốn' : 'thẳng'}</span></div>`);
+    it.onclick = () => pick('link', i);
+    gL.body.appendChild(it);
+  });
+  side.appendChild(gL.root);
+
+  if(sel.kind === 'link' && S.links[sel.i]) side.appendChild(linkPanel(S.links[sel.i], sel.i));
+
+  const gC = group('Khổ khung vẽ');
+  const rw = el(`<div class="row"><label class="lb">Rộng</label><input class="f" type="number" step="10" value="${S.VW}"></div>`);
+  const rh = el(`<div class="row"><label class="lb">Cao</label><input class="f" type="number" step="10" value="${S.VH}"></div>`);
+  rw.querySelector('input').onchange = e => { S.VW = +e.target.value || 1250; save(); render(); };
+  rh.querySelector('input').onchange = e => { S.VH = +e.target.value || 1000; save(); render(); };
+  gC.body.append(rw, rh);
+  side.appendChild(gC.root);
+}
+
+/* ---------- panel chi tiết cho một bảng ---------- */
+function tablePanel(t, i){
+  const g = group('Sửa bảng &nbsp;<span style="color:var(--accent-ink);text-transform:none;letter-spacing:0">'+esc2(t.name)+'</span>');
+  const B = g.body;
+
+  const rn = el('<div class="row"><label class="lb">Tên bảng</label><input class="f"></div>');
+  const inm = rn.querySelector('input');
+  inm.value = t.name;
+  inm.onchange = () => {
+    const old = t.name, nw = inm.value.trim() || old;
+    if(nw !== old){
+      S.links.forEach(l => { if(l.from === old) l.from = nw; if(l.to === old) l.to = nw; });
+      t.name = nw;
+    }
+    save(); render(); panel();
+  };
+  B.appendChild(rn);
+
+  const rowTone = el('<div class="row" style="align-items:flex-start;margin-top:10px"><label class="lb" style="padding-top:5px">Màu</label></div>');
+  const tones = el('<div class="tones"></div>');
+  TONE_KEYS.forEach(k => {
+    const tn = TONE[k];
+    const b = el(`<div class="tone${t.tone===k?' on':''}" title="${k}"
+      style="background:${tn.hd};border-color:${tn.bd};color:${tn.tt}"></div>`);
+    b.onclick = () => {
+      t.tone = k;
+      S.links.forEach(l => { if(l.from === t.name) l.c = TONE[k].bd; });
+      save(); render(); panel();
+    };
+    tones.appendChild(b);
+  });
+  rowTone.appendChild(tones);
+  B.appendChild(rowTone);
+
+  const rp = el(`<div class="row"><label class="lb">X / Y</label>
+      <input class="f" type="number" step="${GRID}" value="${t.x}">
+      <input class="f" type="number" step="${GRID}" value="${t.y}"></div>`);
+  const [ix, iy] = rp.querySelectorAll('input');
+  ix.onchange = () => { t.x = +ix.value||0; save(); render(); };
+  iy.onchange = () => { t.y = +iy.value||0; save(); render(); };
+  B.appendChild(rp);
+
+  const rw = el(`<div class="row"><label class="lb">Bề rộng</label>
+      <input class="f" type="number" step="5" min="120" value="${t.w}"></div>`);
+  rw.querySelector('input').onchange = e => { t.w = Math.max(120, +e.target.value||200); save(); render(); };
+  B.appendChild(rw);
+
+  B.appendChild(el('<div style="height:9px"></div>'));
+  B.appendChild(el('<div style="font-size:11.5px;color:var(--dim-2);margin-bottom:6px">THUỘC TÍNH</div>'));
+  t.fields.forEach((fd, k) => {
+    const r = el(`<div class="fld">
+        <span class="g" title="Đẩy lên trên">⠿</span>
+        <input class="n" placeholder="tên thuộc tính">
+        <input class="t" placeholder="kiểu · PK/FK">
+        <button class="mini x" title="Xóa">✕</button></div>`);
+    const [a, b] = r.querySelectorAll('input');
+    a.value = fd[0]; b.value = fd[1];
+    a.onchange = () => { fd[0] = a.value; save(); render(); };
+    b.onchange = () => { fd[1] = b.value; save(); render(); };
+    r.querySelector('.mini').onclick = () => { t.fields.splice(k,1); save(); render(); panel(); };
+    r.querySelector('.g').onclick = () => {
+      if(k === 0) return;
+      const [m] = t.fields.splice(k,1); t.fields.splice(k-1, 0, m);
+      save(); render(); panel();
+    };
+    B.appendChild(r);
+  });
+  const addF = el('<button class="mini" style="width:100%;margin-top:4px">＋ Thêm thuộc tính</button>');
+  addF.onclick = () => { t.fields.push(['thuộc tính mới','string']); save(); render(); panel(); };
+  B.appendChild(addF);
+
+  B.appendChild(el('<div style="height:11px"></div>'));
+  const rnote = el(`<div><div style="font-size:11.5px;color:var(--dim-2);margin-bottom:5px">GHI CHÚ DƯỚI BẢNG (mỗi dòng một ý)</div>
+      <textarea class="f"></textarea></div>`);
+  const ta = rnote.querySelector('textarea');
+  ta.value = (t.note || []).join('\n');
+  ta.onchange = () => { t.note = ta.value.split('\n').map(s => s.trim()).filter(Boolean); save(); render(); };
+  B.appendChild(rnote);
+
+  const del = el('<button class="mini x" style="width:100%;margin-top:11px">🗑 Xóa bảng này</button>');
+  del.onclick = () => {
+    if(!confirm(`Xóa bảng "${t.name}" và mọi quan hệ liên quan?`)) return;
+    S.links = S.links.filter(l => l.from !== t.name && l.to !== t.name);
+    S.tables.splice(i,1); sel = { kind:null, i:-1 };
+    save(); render(); panel();
+  };
+  B.appendChild(del);
+  return g.root;
+}
+
+/* ---------- panel chi tiết cho một quan hệ ---------- */
+function linkPanel(l, i){
+  const g = group('Sửa quan hệ');
+  const B = g.body;
+
+  B.appendChild(el(`<p class="tip">
+    <b>Chấm tròn xanh</b> ở giữa nét là điểm uốn — kéo để co giãn mũi tên.<br>
+    <b>Vòng rỗng</b> hai đầu là neo — kéo dọc theo mép bảng để đổi chỗ cắm.<br>
+    <b>Nháy đúp</b> lên nét để thêm điểm uốn, nháy đúp lên chấm để bỏ nó.<br>
+    Kéo bảng đi chỗ khác thì neo tự bám theo, đường tự co giãn.</p>`));
+
+  const opts = v => S.tables.map(t =>
+    `<option value="${esc2(t.name)}"${t.name===v?' selected':''}>${esc2(t.name)}</option>`).join('');
+
+  const rf = el(`<div class="row"><label class="lb">Bảng cha</label><select class="f">${opts(l.from)}</select></div>`);
+  const rt = el(`<div class="row"><label class="lb">Bảng con</label><select class="f">${opts(l.to)}</select></div>`);
+  rf.querySelector('select').onchange = e => {
+    l.from = e.target.value;
+    const p = byName(l.from); if(p) l.c = TONE[p.tone].bd;
+    reroute(l); save(); render(); panel();
+  };
+  rt.querySelector('select').onchange = e => { l.to = e.target.value; reroute(l); save(); render(); panel(); };
+  B.append(rf, rt);
+
+  const rl = el(`<div class="row"><label class="lb">Nhãn</label><input class="f" value="${esc2(l.lbl||'1 – n')}"></div>`);
+  rl.querySelector('input').onchange = e => { l.lbl = e.target.value; save(); render(); };
+  B.appendChild(rl);
+
+  const rowTone = el('<div class="row" style="align-items:flex-start;margin-top:10px"><label class="lb" style="padding-top:5px">Màu nét</label></div>');
+  const tones = el('<div class="tones"></div>');
+  TONE_KEYS.forEach(k => {
+    const c = TONE[k].bd;
+    const b = el(`<div class="tone${l.c===c?' on':''}" title="${k}" style="background:${c};border-color:${c};color:#0d0d0f"></div>`);
+    b.onclick = () => { l.c = c; save(); render(); panel(); };
+    tones.appendChild(b);
+  });
+  rowTone.appendChild(tones);
+  B.appendChild(rowTone);
+
+  // neo hai đầu
+  const sideSel = (which, a) => {
+    const r = el(`<div class="row"><label class="lb">Neo ${which==='a'?'cha':'con'}</label>
+        <select class="f" style="flex:1.1">${['r','l','t','b'].map(s =>
+          `<option value="${s}"${a.side===s?' selected':''}>${SIDE_VN[s]}</option>`).join('')}</select>
+        <input class="f" type="number" min="0" max="100" step="5" title="vị trí dọc theo cạnh (%)"
+          value="${Math.round(a.t*100)}" style="flex:.7">
+      </div>`);
+    const [sl] = r.querySelectorAll('select'), [np] = r.querySelectorAll('input');
+    sl.onchange = () => { a.side = sl.value; save(); render(); panel(); };
+    np.onchange = () => { a.t = cl01((+np.value||0)/100); save(); render(); };
+    return r;
+  };
+  B.appendChild(sideSel('a', l.a));
+  B.appendChild(sideSel('b', l.b));
+
+  const nWp = (l.pts || []).length;
+  const rwp = el(`<div class="row" style="margin-top:9px">
+      <label class="lb">Điểm uốn</label>
+      <span style="font-size:12.5px;color:${nWp?'var(--accent-ink)':'var(--dim-2)'}">${nWp || 'không có'}</span></div>`);
+  B.appendChild(rwp);
+
+  const bClear = el('<button class="mini" style="width:100%;margin-bottom:6px">✕ Xóa hết điểm uốn</button>');
+  bClear.onclick = () => { l.pts = []; save(); render(); panel(); };
+  B.appendChild(bClear);
+
+  const bAuto = el('<button class="mini" style="width:100%;margin-bottom:6px">↻ Tự định tuyến lại</button>');
+  bAuto.onclick = () => { reroute(l); save(); render(); panel(); };
+  B.appendChild(bAuto);
+
+  const gm = G[i];
+  const rd = el(`<div><div style="font-size:11.5px;color:var(--dim-2);margin:8px 0 5px">SVG PATH — dán chuỗi khác vào để nạp lại hình</div>
+      <textarea class="f" style="font-family:ui-monospace,Consolas,monospace;font-size:11.4px"></textarea></div>`);
+  const td = rd.querySelector('textarea');
+  td.value = gm ? gm.d : '';
+  td.onchange = () => {
+    const P = parseD(td.value.trim());
+    if(P.length < 2) return;
+    const A = byName(l.from), Bt = byName(l.to);
+    if(!A || !Bt) return;
+    l.a = ancFrom(P[0], rectOf(A));
+    l.b = ancFrom(P[P.length-1], rectOf(Bt));
+    l.pts = P.slice(1, -1);
+    save(); render(); panel();
+  };
+  B.appendChild(rd);
+
+  const lo = l.lo || { dx:0, dy:-8 };
+  const rlbl = el(`<div class="row" style="margin-top:8px"><label class="lb">Nhãn lệch</label>
+      <input class="f" type="number" value="${lo.dx}"><input class="f" type="number" value="${lo.dy}"></div>`);
+  const [ldx, ldy] = rlbl.querySelectorAll('input');
+  ldx.onchange = () => { l.lo = { dx:+ldx.value||0, dy:(l.lo||lo).dy }; save(); render(); };
+  ldy.onchange = () => { l.lo = { dx:(l.lo||lo).dx, dy:+ldy.value||0 }; save(); render(); };
+  B.appendChild(rlbl);
+
+  const ral = el(`<div class="row"><label class="lb">Canh chữ</label>
+      <select class="f">${['middle','start','end'].map(v =>
+        `<option value="${v}"${(l.anchor||'middle')===v?' selected':''}>${v}</option>`).join('')}</select></div>`);
+  ral.querySelector('select').onchange = e => {
+    if(e.target.value === 'middle') delete l.anchor; else l.anchor = e.target.value;
+    save(); render();
+  };
+  B.appendChild(ral);
+
+  const del = el('<button class="mini x" style="width:100%;margin-top:11px">🗑 Xóa quan hệ này</button>');
+  del.onclick = () => { S.links.splice(i,1); sel = { kind:null, i:-1 }; save(); render(); panel(); };
+  B.appendChild(del);
+  return g.root;
+}
+
+function reroute(l){
+  const A = byName(l.from), B = byName(l.to);
+  if(!A || !B) return;
+  Object.assign(l, autoAnc(rectOf(A), rectOf(B)));
+  delete l.lo;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   8. THANH CÔNG CỤ
+   ══════════════════════════════════════════════════════════════ */
+document.getElementById('btAddTable').onclick = () => {
+  let n = 1, nm;
+  do { nm = 'bang_moi_' + n++; } while(byName(nm));
+  S.tables.push({
+    name:nm, tone:'blue',
+    x:snap(20 + (S.tables.length % 5) * 40),
+    y:snap(20 + (S.tables.length % 7) * 30),
+    w:220, fields:[['mã ' + nm,'uuid · PK']], note:[]
+  });
+  sel = { kind:'table', i:S.tables.length - 1 };
+  save(); render(); panel();
+};
+
+document.getElementById('btAddLink').onclick = () => {
+  if(S.tables.length < 2){ alert('Cần ít nhất 2 bảng để tạo quan hệ.'); return; }
+  const a = S.tables[0], b = S.tables[1];
+  const l = { from:a.name, to:b.name, c:TONE[a.tone].bd, lbl:'1 – n' };
+  Object.assign(l, autoAnc(rectOf(a), rectOf(b)));
+  S.links.push(l);
+  sel = { kind:'link', i:S.links.length - 1 };
+  save(); render(); panel();
+};
+
+document.getElementById('btReset').onclick = () => {
+  if(!confirm('Bỏ mọi chỉnh sửa và quay về sơ đồ ERD gốc?')) return;
+  S = migrate(seed()); sel = { kind:null, i:-1 };
+  save(); render(); panel();
+};
+
+/* ---------- xuất / nhập ---------- */
+const dlg = document.getElementById('dlg');
+const dlgCode = document.getElementById('dlgCode');
+const dlgIn = document.getElementById('dlgIn');
+const dlgSteps = document.getElementById('dlgSteps');
+const dlgTitle = document.getElementById('dlgTitle');
+const btCopy = document.getElementById('btCopy');
+const saveMsg = document.getElementById('saveMsg');
+const TARGET_FILE = 'so-do-crm-actor-v2.html';
+const SAVE_ENDPOINT = 'http://127.0.0.1:5179/save-erd';
+
+const q = s => "'" + String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'") + "'";
+
+function emit(){
+  G = S.links.map(geom);
+
+  let out = '  const tables = [\n';
+  out += S.tables.map(t => {
+    let s = `    { name:${q(t.name)}, tone:${q(t.tone)}, x:${t.x}, y:${t.y}, w:${t.w}, fields:[\n`;
+    s += t.fields.map(fd => `      [${q(fd[0])},${q(fd[1])}]`).join(',\n') + '\n';
+    s += (t.note && t.note.length) ? `    ], note:[${t.note.map(q).join(',')}] }` : `    ]}`;
+    return s;
+  }).join(',\n') + '\n  ];\n\n';
+
+  out += '  const links = [\n';
+  out += S.links.map((l, i) => {
+    const gm = G[i] || { d:'M0,0', lx:0, ly:0 };
+    let s = `    // ${l.from} ${l.lbl || '1 – n'} ${l.to}\n`;
+    s += `    { c:${q(l.c)}, d:${q(gm.d)}, lx:${gm.lx}, ly:${gm.ly}`;
+    if(l.anchor) s += `, anchor:${q(l.anchor)}`;
+    if(l.lbl && l.lbl !== '1 – n') s += `, lbl:${q(l.lbl)}`;
+    return s + ' }';
+  }).join(',\n') + '\n  ];\n\n';
+
+  const colors = [...new Set(S.links.map(l => l.c))];
+  out += `  let defs = '', body = '';\n`;
+  out += `  const AH = [${colors.map(q).join(',')}];\n`;
+  return out;
+}
+
+function setSaveMsg(text, type){
+  saveMsg.textContent = text || '';
+  saveMsg.className = 'save-msg' + (type ? ' ' + type : '');
+  if(type === 'ok') setTimeout(() => {
+    if(saveMsg.textContent === text) setSaveMsg('');
+  }, 2600);
+}
+
+async function saveToWorkflowFile(){
+  const res = await fetch(SAVE_ENDPOINT, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body:JSON.stringify({
+      target:TARGET_FILE,
+      vw:Number(S.VW) || 1250,
+      vh:Number(S.VH) || 1000,
+      code:emit().trimEnd()
+    })
+  });
+  const data = await res.json().catch(() => ({}));
+  if(!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+
+document.getElementById('btSaveTarget').onclick = async () => {
+  save();
+  setSaveMsg('Đang lưu...');
+  try{
+    await saveToWorkflowFile();
+    setSaveMsg(`Đã cập nhật ${TARGET_FILE}`, 'ok');
+  }catch(e){
+    setSaveMsg('Không lưu được', 'err');
+    alert('Không lưu được vào file tổng: ' + (e && e.message ? e.message : e) +
+      '\n\nHãy chạy local save server rồi mở lại editor:\nnode workflow/erd-save-server.js\n\nSau đó dùng địa chỉ http://127.0.0.1:5179/erd-editor.html');
+  }
+};
+
+document.getElementById('btExport').onclick = () => {
+  dlgTitle.textContent = 'Code để dán vào so-do-crm-actor-v2.html';
+  dlgSteps.innerHTML =
+    'Mở <code>so-do-crm-actor-v2.html</code>, tìm khối <code>&lt;!-- VẼ SƠ ĐỒ ERD --&gt;</code> ở cuối file. '
+  + 'Thay ba khai báo <code>const tables</code>, <code>const links</code> và <code>const AH</code> bằng đoạn dưới đây. '
+  + 'Phần code vẽ phía sau giữ nguyên, không cần đụng tới.';
+  dlgCode.style.display = ''; dlgIn.style.display = 'none';
+  btCopy.textContent = 'Sao chép';
+  dlgCode.textContent = emit();
+  dlg.showModal();
+};
+
+document.getElementById('btImport').onclick = () => {
+  dlgTitle.textContent = 'Nhập lại dữ liệu (JSON)';
+  dlgSteps.innerHTML = 'Dán JSON đã lưu trước đó rồi bấm <b>Nạp</b>. Dùng để chuyển sơ đồ sang máy khác hoặc quay lại một bản cũ.';
+  dlgCode.style.display = 'none'; dlgIn.style.display = '';
+  dlgIn.value = JSON.stringify(S, null, 2);
+  btCopy.textContent = 'Nạp';
+  dlg.showModal();
+};
+
+btCopy.onclick = () => {
+  if(btCopy.textContent === 'Nạp'){
+    try{
+      const o = JSON.parse(dlgIn.value);
+      if(!o || !Array.isArray(o.tables) || !Array.isArray(o.links)) throw new Error('thiếu mảng tables / links');
+      S = migrate(o); sel = { kind:null, i:-1 };
+      save(); render(); panel(); dlg.close();
+    }catch(e){ alert('JSON không hợp lệ: ' + e.message); }
+    return;
+  }
+  navigator.clipboard.writeText(dlgCode.textContent).then(
+    () => { btCopy.textContent = '✓ Đã chép'; setTimeout(() => btCopy.textContent = 'Sao chép', 1400); },
+    () => alert('Trình duyệt chặn clipboard — hãy bôi đen đoạn code rồi Ctrl+C.')
+  );
+};
+
+document.getElementById('btClose').onclick = () => dlg.close();
+
+/* ---------- phím tắt ---------- */
+addEventListener('keydown', e => {
+  if(dlg.open) return;
+  const tag = (e.target.tagName || '').toLowerCase();
+  if(tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  if(e.key === 'Delete' && sel.kind === 'table'){
+    const t = S.tables[sel.i];
+    if(t && confirm(`Xóa bảng "${t.name}"?`)){
+      S.links = S.links.filter(l => l.from !== t.name && l.to !== t.name);
+      S.tables.splice(sel.i,1); sel = { kind:null, i:-1 };
+      save(); render(); panel();
+    }
+  }
+  if(e.key === 'Delete' && sel.kind === 'link'){
+    S.links.splice(sel.i,1); sel = { kind:null, i:-1 };
+    save(); render(); panel();
+  }
+  if(e.key === 'Escape') pick(null,-1);
+});
+
+render();
+panel();
+})();
+</script>
+</body>
+</html>

@@ -154,8 +154,7 @@ flowchart TD
   <!-- ===================== DỮ LIỆU ===================== -->
   <section>
     <h2>Dữ liệu chính</h2>
-
-    <h3 class="tbl-title"><span class="code">LICH_LAI_THU</span><span class="note">Mỗi dòng là một lượt đăng ký lái thử</span></h3>
+    <h3 class="tbl-title"><span class="code">customers</span><span class="note">Mỗi dòng là một lượt đăng ký lái thử</span></h3>
     <div class="tbl-scroll">
       <table>
         <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
@@ -163,7 +162,7 @@ flowchart TD
         <tr><td><code>Số điện thoại</code></td><td>Text</td><td>Có (hoặc Email)</td><td>Dùng để gửi thông báo lịch lái thử</td></tr>
         <tr><td><code>Email</code></td><td>Text</td><td>Có (hoặc SĐT)</td><td>Dùng để gửi thông báo lịch lái thử</td></tr>
         <tr><td><code>Mẫu xe muốn lái thử</code></td><td>Text</td><td>Có</td><td>Xe khách chọn để lái thử</td></tr>
-        <tr><td><code>Showroom lái thử</code></td><td>Liên kết → <code>SHOWROOM.Mã showroom</code></td><td>Có</td><td>Showroom khách chọn để đến lái thử</td></tr>
+        <tr><td><code>Showroom lái thử</code></td><td>Liên kết → <code>showrooms.Mã showroom</code></td><td>Có</td><td>Showroom khách chọn để đến lái thử</td></tr>
         <tr><td><code>Thời gian mong muốn</code></td><td>Ngày giờ</td><td>Có</td><td>Khung giờ khách chọn lúc đăng ký</td></tr>
         <tr><td><code>Thời gian xác nhận</code></td><td>Ngày giờ</td><td>Có (sau khi xác nhận)</td><td>Có thể khác thời gian mong muốn nếu phải dời lịch</td></tr>
         <tr><td><code>Trạng thái lịch hẹn</code></td><td>Enum</td><td>Có</td><td>Chờ xác nhận / Đã xác nhận / Đã gửi thông báo</td></tr>
@@ -172,12 +171,25 @@ flowchart TD
       </table>
     </div>
 
-    <h3 class="tbl-title"><span class="code">SHOWROOM</span><span class="note">Danh mục các showroom cửa hàng đang quản lý</span></h3>
+    <h3 class="tbl-title"><span class="code">showrooms</span><span class="note">Danh mục các showroom cửa hàng đang quản lý</span></h3>
     <div class="tbl-scroll">
       <table>
         <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
-        <tr><td><code>Mã showroom</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh duy nhất, ví dụ <code>SR1</code>; được <code>LICH_LAI_THU.Showroom lái thử</code> tham chiếu tới</td></tr>
-        <tr><td><code>Tên showroom</code></td><td>Text</td><td>Có</td><td>Tên hiển thị cho khách chọn khi đăng ký(SHOWROOM 1)</td></tr>
+        <tr><td><code>Mã showroom</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh duy nhất, ví dụ <code>SR1</code>; được <code>customers.Showroom lái thử</code> tham chiếu tới</td></tr>
+        <tr><td><code>Tên showroom</code></td><td>Text</td><td>Có</td><td>Tên hiển thị cho khách chọn khi đăng ký, ví dụ <code>Showroom 1</code></td></tr>
+      </table>
+    </div>
+
+    <h3 class="tbl-title"><span class="code">telegram_messages</span><span class="note">Nhật ký tin nhắn trao đổi với khách quanh lịch lái thử</span></h3>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code>Mã tin nhắn</code></td><td>Text (khóa chính)</td><td>Có</td><td>Định danh duy nhất của một lượt gửi hoặc nhận</td></tr>
+        <tr><td><code>Mã khách hàng</code></td><td>Liên kết → <code>customers.Mã khách hàng</code></td><td>Có</td><td>Mọi tin nhắn đều truy về một khách đã đăng ký</td></tr>
+        <tr><td><code>Mã nhân viên</code></td><td>Liên kết → <code>employees.Mã nhân viên</code></td><td>Không</td><td>Để rỗng nghĩa là tin do hệ thống tự động gửi</td></tr>
+        <tr><td><code>Chiều</code></td><td>Enum</td><td>Có</td><td>in (khách gửi) / out (hệ thống hoặc Sales gửi)</td></tr>
+        <tr><td><code>Nội dung</code></td><td>Text dài</td><td>Có</td><td>Thông báo lịch lái thử, hoặc nội dung trao đổi dời lịch</td></tr>
+        <tr><td><code>Thời gian</code></td><td>Ngày giờ</td><td>Có</td><td>Căn cứ đối soát đã gửi thông báo cho khách hay chưa</td></tr>
       </table>
     </div>
   </section>
