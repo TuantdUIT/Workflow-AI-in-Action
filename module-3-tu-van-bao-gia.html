@@ -161,6 +161,22 @@ flowchart TD
     </div>
   </section>
 
+  <!-- ===================== INTERNAL DOCUMENT ===================== -->
+  <section>
+    <h2>Internal document</h2>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Trường</th><th>Kiểu</th><th>Bắt buộc</th><th>Ghi chú</th></tr>
+        <tr><td><code>Mã tài liệu</code></td><td>ID</td><td>Có</td><td>Khóa chính, sinh tự động khi upload</td></tr>
+        <tr><td><code>Loại tài liệu</code></td><td>Enum</td><td>Có</td><td>Catalog · Bảng giá · Brochure kỹ thuật · Hợp đồng mẫu · Chính sách bán hàng · Bảng tính trả góp</td></tr>
+        <tr><td><code>Tên tài liệu</code></td><td>Text</td><td>Có</td><td>Tên hiển thị trong CRM &amp; dùng cho RAG index</td></tr>
+        <tr><td><code>URL / Đường dẫn</code></td><td>URL</td><td>Có</td><td>Link nội bộ (SharePoint / Drive / CRM storage) — không lưu trực tiếp file</td></tr>
+        <tr><td><code>Ngày cập nhật</code></td><td>Date</td><td>Có</td><td>Ngày upload / sửa mới nhất</td></tr>
+        <tr><td><code>Đính kèm báo giá</code></td><td>List&lt;Báo giá&gt;</td><td>Không</td><td>Danh sách báo giá đã gửi kèm tài liệu này cho khách</td></tr>
+      </table>
+    </div>
+  </section>
+
   <!-- ===================== TIÊU CHÍ CHẤP NHẬN ===================== -->
   <section>
     <h2>Tiêu chí chấp nhận &amp; chỉ số đo</h2>
