@@ -81,7 +81,7 @@
     background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.25);border-radius:5px;cursor:pointer;opacity:0;transition:.14s}
 
   /* ---------- Sơ đồ ERD ---------- */
-  .erd{max-width:900px;margin:0 auto;padding:0 16px 70px}
+  .erd{max-width:1190px;margin:0 auto;padding:0 16px 70px}
   .erd .sep{height:1px;background:#24242a;margin:0 0 28px}
   .erd h2{font-size:17px;font-weight:700;margin:0 0 5px;text-align:center}
   .erd p.sub{margin:0 0 6px;text-align:center;font-size:12.5px;color:var(--label)}
@@ -127,12 +127,13 @@
   <section class="erd">
     <div class="sep"></div>
     <h2>Sơ đồ ERD — cấu trúc dữ liệu</h2>
-    <p class="sub">Tám bảng dữ liệu dùng chung cho cả 5 module. Mũi tên chỉ chiều quan hệ: từ bảng cha (phía <b>1</b>) sang bảng con (phía <b>n</b>).</p>
+    <p class="sub">Chín bảng dữ liệu dùng chung cho cả 5 module. Mũi tên chỉ chiều quan hệ: từ bảng cha (phía <b>1</b>) sang bảng con (phía <b>n</b>).</p>
     <div class="erd-legend">
       <span style="color:#1a916c"><i></i>Quan hệ từ <code>showrooms</code></span>
       <span style="color:#2076b8"><i></i>Quan hệ từ <code>employees</code> / <code>customers</code></span>
       <span style="color:#5b45a6"><i></i>Quan hệ từ <code>models</code></span>
       <span style="color:#c8922e"><i></i>Quan hệ từ <code>orders</code></span>
+      <span style="color:#2b8fb5"><i></i>Quan hệ kênh Telegram</span>
     </div>
     <div class="board"><svg id="erd" role="img" aria-label="Sơ đồ ERD các bảng dữ liệu CRM"></svg></div>
   </section>
@@ -365,13 +366,14 @@ boot();
 <!-- ===================== VẼ SƠ ĐỒ ERD ===================== -->
 <script>
 (function(){
-  const HDR = 32, ROW = 27, PAD = 13, VW = 960, VH = 920;
+  const HDR = 32, ROW = 27, PAD = 13, VW = 1250, VH = 1000;
   const TONE = {
     teal:{ hd:'#0d4b39', bd:'#1a916c', tt:'#74dcae' },
     blue:{ hd:'#123b5e', bd:'#2076b8', tt:'#8fc4ec' },
     rust:{ hd:'#5f2a18', bd:'#a04a2a', tt:'#e2a88f' },
     purple:{ hd:'#3a2b6d', bd:'#5b45a6', tt:'#bcaef0' },
-    amber:{ hd:'#5a3a10', bd:'#c8922e', tt:'#f0c674' }
+    amber:{ hd:'#5a3a10', bd:'#c8922e', tt:'#f0c674' },
+    sky:{ hd:'#0e3d52', bd:'#2b8fb5', tt:'#8ad3ee' }
   };
   const esc2 = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
@@ -443,7 +445,18 @@ boot();
     // vào dropdown chọn giờ trên form đăng ký
     { name:'driving_hours', tone:'purple', x:40, y:700, w:195, fields:[
       ['giờ lái','time · PK']
-    ], note:['nguồn dữ liệu đổ vào dropdown','chọn giờ trên form đăng ký'] }
+    ], note:['nguồn dữ liệu đổ vào dropdown','chọn giờ trên form đăng ký'] },
+    // ===== bảng phục vụ kênh Telegram (1 bot duy nhất) =====
+    // khung chat — mỗi dòng là một câu trao đổi giữa khách và hệ thống
+    { name:'telegram_messages', tone:'sky', x:985, y:400, w:245, fields:[
+      ['mã tin nhắn','uuid · PK'],
+      ['mã khách hàng','uuid · FK'],
+      ['mã nhân viên','uuid · FK'],
+      ['chiều','enum'],
+      ['nội dung','text'],
+      ['telegram message id','bigint'],
+      ['thời gian','datetime']
+    ], note:['chiều: in (khách gửi) · out (bot hoặc sales gửi)','mã nhân viên rỗng = tin do bot tự động gửi'] }
   ];
 
   // Đường nối: đi theo góc vuông, bo góc; mũi tên đặt ở đầu bảng con (phía n)
@@ -464,11 +477,16 @@ boot();
     // models 1 — n orders
     { c:'#5b45a6', d:'M700,603 H584', lx:642, ly:593 },
     // orders 1 — 1 contracts (mỗi đơn hàng đã ký sinh đúng một hợp đồng)
-    { c:'#c8922e', d:'M580,803 H694', lx:637, ly:793, lbl:'1 – 1' }
+    { c:'#c8922e', d:'M580,803 H694', lx:637, ly:793, lbl:'1 – 1' },
+    // customers 1 — n telegram_messages (xương sống: mọi tin nhắn truy về một khách)
+    { c:'#2b8fb5', d:'M585,470 H981', lx:800, ly:462 },
+    // employees 1 — n telegram_messages (sales nhắn tay; đi vòng mép dưới cho khỏi cắt bảng)
+    { c:'#2b8fb5', d:'M20,350 H16 Q6,350 6,360 V940 Q6,950 16,950 H950 Q970,950 970,930 V590 Q970,580 980,580 H981',
+      lx:500, ly:942 }
   ];
 
   let defs = '', body = '';
-  const AH = ['#1a916c','#2076b8','#5b45a6','#c8922e'];
+  const AH = ['#1a916c','#2076b8','#5b45a6','#c8922e','#2b8fb5'];
   AH.forEach((c,i) => {
     defs += `<marker id="erd-ah${i}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7"
       orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="${c}" stroke-width="1.6"
