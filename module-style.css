@@ -95,6 +95,10 @@ td code{font-family:ui-monospace,Consolas,monospace;font-size:12.3px;color:var(-
 .callout ul{margin:0;padding-left:19px;color:var(--dim)}
 .callout li{margin:5px 0}
 
+/* --- sơ đồ quy trình (svg) --- */
+.flow-diagram{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:15px 18px;margin:0}
+.flow-title{font-size:14.5px;font-weight:600;margin:0 0 12px;color:var(--ink)}
+
 /* --- điều hướng cuối trang --- */
 .nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;
   border-top:1px solid var(--line);padding-top:20px;margin-top:44px}
