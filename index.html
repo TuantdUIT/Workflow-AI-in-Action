@@ -81,7 +81,7 @@
     background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.25);border-radius:5px;cursor:pointer;opacity:0;transition:.14s}
 
   /* ---------- Sơ đồ ERD ---------- */
-  .erd{max-width:1190px;margin:0 auto;padding:0 16px 70px}
+  .erd{max-width:1400px;margin:0 auto;padding:0 16px 70px}
   .erd .sep{height:1px;background:#24242a;margin:0 0 28px}
   .erd h2{font-size:17px;font-weight:700;margin:0 0 5px;text-align:center}
   .erd p.sub{margin:0 0 6px;text-align:center;font-size:12.5px;color:var(--label)}
@@ -127,7 +127,7 @@
   <section class="erd">
     <div class="sep"></div>
     <h2>Sơ đồ ERD — cấu trúc dữ liệu</h2>
-    <p class="sub">Chín bảng dữ liệu dùng chung cho cả 5 module. Mũi tên chỉ chiều quan hệ: từ bảng cha (phía <b>1</b>) sang bảng con (phía <b>n</b>).</p>
+    <p class="sub">Mười một bảng dữ liệu dùng chung cho cả 5 module. Mũi tên chỉ chiều quan hệ: từ bảng cha (phía <b>1</b>) sang bảng con (phía <b>n</b>).</p>
     <div class="erd-legend">
       <span style="color:#1a916c"><i></i>Quan hệ từ <code>showrooms</code></span>
       <span style="color:#2076b8"><i></i>Quan hệ từ <code>employees</code> / <code>customers</code></span>
@@ -366,7 +366,7 @@ boot();
 <!-- ===================== VẼ SƠ ĐỒ ERD ===================== -->
 <script>
 (function(){
-  const HDR = 32, ROW = 27, PAD = 13, VW = 1250, VH = 1000;
+  const HDR = 32, ROW = 27, PAD = 13, VW = 1500, VH = 1000;
   const TONE = {
     teal:{ hd:'#0d4b39', bd:'#1a916c', tt:'#74dcae' },
     blue:{ hd:'#123b5e', bd:'#2076b8', tt:'#8fc4ec' },
@@ -380,18 +380,27 @@ boot();
   // Tên bảng giữ nguyên tiếng Anh; tên thuộc tính chuyển sang tiếng Việt
   // (giữ nguyên các thuật ngữ kỹ thuật: email, model, uuid, string, enum, datetime, PK, FK)
   const tables = [
-    { name:'showrooms', tone:'teal', x:350, y:16, w:210, fields:[
+    { name:'showrooms', tone:'teal', x:580, y:16, w:210, fields:[
       ['mã showroom','uuid · PK'],
       ['tên showroom','string']
     ]},
-    { name:'employees', tone:'blue', x:20, y:230, w:235, fields:[
+    { name:'employees', tone:'blue', x:250, y:230, w:235, fields:[
       ['mã nhân viên','uuid · PK'],
       ['họ tên','string'],
       ['email','string'],
       ['số điện thoại','string'],
-      ['mã showroom','uuid · FK']
+      ['mã showroom','uuid · FK'],
+      ['mật khẩu (hash)','string'],
+      ['vai trò','enum'],
+      ['đang hoạt động','boolean']
     ]},
-    { name:'customers', tone:'blue', x:330, y:170, w:255, fields:[
+    { name:'sessions', tone:'blue', x:20, y:285, w:190, fields:[
+      ['mã phiên','uuid · PK'],
+      ['mã nhân viên','uuid · FK'],
+      ['thời gian hết hạn','datetime'],
+      ['thời gian thu hồi','datetime']
+    ], note:['thời gian thu hồi rỗng = phiên còn hiệu lực'] },
+    { name:'customers', tone:'blue', x:560, y:170, w:255, fields:[
       ['mã khách hàng','uuid · PK'],
       ['họ tên','string'],
       ['số điện thoại','string'],
@@ -404,7 +413,7 @@ boot();
       ['mã nhân viên phụ trách','uuid · FK'],
       ['kênh đăng ký','enum']
     ]},
-    { name:'orders', tone:'amber', x:365, y:590, w:250, fields:[
+    { name:'orders', tone:'amber', x:595, y:590, w:250, fields:[
       ['mã đơn hàng','uuid · PK'],
       ['mã khách hàng','uuid · FK'],
       ['mã nhân viên','uuid · FK'],
@@ -416,27 +425,27 @@ boot();
       ['ngày bàn giao','datetime'],
       ['trạng thái','enum']
     ], note:['chỉ tạo khi khách đã đặt cọc','trạng thái: đã cọc → đã ký HĐ → đã chốt deal'] },
-    { name:'contracts', tone:'amber', x:700, y:720, w:235, fields:[
+    { name:'contracts', tone:'amber', x:930, y:720, w:235, fields:[
       ['mã hợp đồng','uuid · PK'],
       ['mã đơn hàng','uuid · FK'],
       ['số hợp đồng','string'],
       ['ngày ký','datetime'],
       ['đường dẫn file','string']
     ]},
-    { name:'internal_documents', tone:'rust', x:710, y:75, w:235, fields:[
+    { name:'internal_documents', tone:'rust', x:940, y:75, w:235, fields:[
       ['mã tài liệu','uuid · PK'],
       ['nhãn phân loại','enum'],
       ['tên tài liệu','string'],
       ['đường dẫn','string']
     ], note:['tài liệu phục vụ tư vấn · báo giá','(brochure, bảng giá, chính sách)'] },
-    { name:'models', tone:'purple', x:700, y:560, w:195, fields:[
+    { name:'models', tone:'purple', x:930, y:560, w:195, fields:[
       ['mã xe','uuid · PK'],
       ['tên xe','string']
     ], note:['nguồn dữ liệu đổ vào dropdown','chọn xe trên form đăng ký'] },
-    { name:'driving_hours', tone:'purple', x:1015, y:125, w:195, fields:[
+    { name:'driving_hours', tone:'purple', x:1245, y:125, w:195, fields:[
       ['giờ lái','time · PK']
     ], note:['nguồn dữ liệu đổ vào dropdown','chọn giờ trên form đăng ký'] },
-    { name:'telegram_messages', tone:'sky', x:1015, y:405, w:245, fields:[
+    { name:'telegram_messages', tone:'sky', x:1245, y:405, w:245, fields:[
       ['mã tin nhắn','uuid · PK'],
       ['mã khách hàng','uuid · FK'],
       ['mã nhân viên','uuid · FK'],
@@ -445,7 +454,7 @@ boot();
       ['telegram message id','bigint'],
       ['thời gian','datetime']
     ], note:['chiều: in (khách gửi) · out (bot hoặc sales gửi)','mã nhân viên rỗng = tin do bot tự động gửi'] },
-    { name:'marketing_content', tone:'blue', x:25, y:695, w:220, fields:[
+    { name:'marketing_content', tone:'blue', x:255, y:695, w:220, fields:[
       ['mã nội dung','uuid · PK'],
       ['mã nhân viên','uuid · FK'],
       ['loại nội dung','string'],
@@ -457,27 +466,29 @@ boot();
 
   const links = [
     // showrooms 1 – n employees
-    { c:'#1a916c', d:'M350,59 H147 Q137,59 137,69 V224', lx:161, ly:51 },
+    { c:'#1a916c', d:'M580,59 H377 Q367,59 367,69 V224', lx:391, ly:51 },
     // showrooms 1 – n customers
-    { c:'#1a916c', d:'M455,102 V164', lx:455, ly:125, anchor:'start' },
+    { c:'#1a916c', d:'M685,102 V164', lx:685, ly:125, anchor:'start' },
     // showrooms 1 – n orders
-    { c:'#1a916c', d:'M560,59 H660 Q670,59 670,69 V537.5 Q670,540 670,537.5 V536.3 Q670,535 668.8,535 H580 Q570,535 570,545 V584', lx:670, ly:314, anchor:'start' },
+    { c:'#1a916c', d:'M790,59 H890 Q900,59 900,69 V537.5 Q900,540 900,537.5 V536.3 Q900,535 898.8,535 H810 Q800,535 800,545 V584', lx:900, ly:314, anchor:'start' },
     // employees 1 – n customers
-    { c:'#2076b8', d:'M255,313 H324', lx:290, ly:305 },
+    { c:'#2076b8', d:'M485,313 H554', lx:520, ly:305 },
     // employees 1 – n orders
-    { c:'#2076b8', d:'M219.3,397 V615 H220 H289.5 V615.6 H359', lx:219, ly:568 },
+    { c:'#2076b8', d:'M449.3,478 V605 Q449.3,615 459.3,615 H589', lx:457, ly:560, anchor:'start' },
+    // employees 1 – n sessions
+    { c:'#2076b8', d:'M250,310 H216', lx:233, ly:302 },
     // customers 1 – n orders
-    { c:'#2076b8', d:'M455,499 V531.5 Q455,541.5 465,541.5 H480 Q490,541.5 490,551.5 V584', lx:473, ly:534, anchor:'start' },
+    { c:'#2076b8', d:'M685,499 V531.5 Q685,541.5 695,541.5 H710 Q720,541.5 720,551.5 V584', lx:703, ly:534, anchor:'start' },
     // models 1 – n orders
-    { c:'#5b45a6', d:'M700,603 H669.5 Q659.5,603 659.5,613 V623 Q659.5,633 649.5,633 H619', lx:660, ly:610 },
+    { c:'#5b45a6', d:'M930,603 H899.5 Q889.5,603 889.5,613 V623 Q889.5,633 879.5,633 H849', lx:890, ly:610 },
     // orders 1 – 1 contracts
-    { c:'#c8922e', d:'M615,833 H644.5 Q654.5,833 654.5,823 V813 Q654.5,803 664.5,803 H694', lx:655, ly:810, lbl:'1 – 1' },
+    { c:'#c8922e', d:'M845,833 H874.5 Q884.5,833 884.5,823 V813 Q884.5,803 894.5,803 H924', lx:885, ly:810, lbl:'1 – 1' },
     // customers 1 – n telegram_messages
-    { c:'#2b8fb5', d:'M585,470 H795.5 Q798,470 798,472.5 V473.8 Q798,475 799.3,475 H1011', lx:798, ly:465 },
+    { c:'#2b8fb5', d:'M815,470 H1025.5 Q1028,470 1028,472.5 V473.8 Q1028,475 1029.3,475 H1241', lx:1028, ly:465 },
     // employees 1 – n telegram_messages
-    { c:'#2b8fb5', d:'M20,350 H13 Q6,350 6,357 V940 Q6,950 16,950 H967.5 Q970,950 972.5,950 H973.8 Q975,950 975,948.8 V820 Q975,810 975,800 V636 Q975,626 985,626 H1011', lx:364, ly:942 },
+    { c:'#2b8fb5', d:'M250,350 H243 Q236,350 236,357 V940 Q236,950 246,950 H1197.5 Q1200,950 1202.5,950 H1203.8 Q1205,950 1205,948.8 V820 Q1205,810 1205,800 V610 Q1205,600 1215,600 H1239', lx:594, ly:942 },
     // employees 1 – n marketing_content
-    { c:'#a04a2a', d:'M136.3,397 V689', lx:136, ly:535 }
+    { c:'#a04a2a', d:'M366.3,478 V689', lx:374, ly:600, anchor:'start' }
   ];
 
   let defs = '', body = '';

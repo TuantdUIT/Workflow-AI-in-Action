@@ -187,20 +187,29 @@ const near  = (a,b) => Math.abs(a-b) < 0.5;
    neo + điểm uốn, nên hình dạng giữ nguyên mà vẫn kéo được.
    ══════════════════════════════════════════════════════════════ */
 function seed(){ return {
-  VW:1250, VH:1000,
+  VW:1500, VH:1000,
   tables:[
-    { name:'showrooms', tone:'teal', x:350, y:16, w:210, fields:[
+    { name:'showrooms', tone:'teal', x:580, y:16, w:210, fields:[
       ['mã showroom','uuid · PK'],
       ['tên showroom','string']
     ], note:[] },
-    { name:'employees', tone:'blue', x:20, y:230, w:235, fields:[
+    { name:'employees', tone:'blue', x:250, y:230, w:235, fields:[
       ['mã nhân viên','uuid · PK'],
       ['họ tên','string'],
       ['email','string'],
       ['số điện thoại','string'],
-      ['mã showroom','uuid · FK']
+      ['mã showroom','uuid · FK'],
+      ['mật khẩu (hash)','string'],
+      ['vai trò','enum'],
+      ['đang hoạt động','boolean']
     ], note:[] },
-    { name:'customers', tone:'blue', x:330, y:170, w:255, fields:[
+    { name:'sessions', tone:'blue', x:20, y:285, w:190, fields:[
+      ['mã phiên','uuid · PK'],
+      ['mã nhân viên','uuid · FK'],
+      ['thời gian hết hạn','datetime'],
+      ['thời gian thu hồi','datetime']
+    ], note:['thời gian thu hồi rỗng = phiên còn hiệu lực'] },
+    { name:'customers', tone:'blue', x:560, y:170, w:255, fields:[
       ['mã khách hàng','uuid · PK'],
       ['họ tên','string'],
       ['số điện thoại','string'],
@@ -213,7 +222,7 @@ function seed(){ return {
       ['mã nhân viên phụ trách','uuid · FK'],
       ['kênh đăng ký','enum']
     ], note:[] },
-    { name:'orders', tone:'amber', x:330, y:560, w:250, fields:[
+    { name:'orders', tone:'amber', x:595, y:590, w:250, fields:[
       ['mã đơn hàng','uuid · PK'],
       ['mã khách hàng','uuid · FK'],
       ['mã nhân viên','uuid · FK'],
@@ -225,27 +234,27 @@ function seed(){ return {
       ['ngày bàn giao','datetime'],
       ['trạng thái','enum']
     ], note:['chỉ tạo khi khách đã đặt cọc','trạng thái: đã cọc → đã ký HĐ → đã chốt deal'] },
-    { name:'contracts', tone:'amber', x:700, y:720, w:235, fields:[
+    { name:'contracts', tone:'amber', x:930, y:720, w:235, fields:[
       ['mã hợp đồng','uuid · PK'],
       ['mã đơn hàng','uuid · FK'],
       ['số hợp đồng','string'],
       ['ngày ký','datetime'],
       ['đường dẫn file','string']
     ], note:[] },
-    { name:'internal_documents', tone:'rust', x:700, y:100, w:235, fields:[
+    { name:'internal_documents', tone:'rust', x:940, y:75, w:235, fields:[
       ['mã tài liệu','uuid · PK'],
       ['nhãn phân loại','enum'],
       ['tên tài liệu','string'],
       ['đường dẫn','string']
     ], note:['tài liệu phục vụ tư vấn · báo giá','(brochure, bảng giá, chính sách)'] },
-    { name:'models', tone:'purple', x:700, y:560, w:195, fields:[
+    { name:'models', tone:'purple', x:930, y:560, w:195, fields:[
       ['mã xe','uuid · PK'],
       ['tên xe','string']
     ], note:['nguồn dữ liệu đổ vào dropdown','chọn xe trên form đăng ký'] },
-    { name:'driving_hours', tone:'purple', x:40, y:700, w:195, fields:[
+    { name:'driving_hours', tone:'purple', x:1245, y:125, w:195, fields:[
       ['giờ lái','time · PK']
     ], note:['nguồn dữ liệu đổ vào dropdown','chọn giờ trên form đăng ký'] },
-    { name:'telegram_messages', tone:'sky', x:985, y:400, w:245, fields:[
+    { name:'telegram_messages', tone:'sky', x:1245, y:405, w:245, fields:[
       ['mã tin nhắn','uuid · PK'],
       ['mã khách hàng','uuid · FK'],
       ['mã nhân viên','uuid · FK'],
@@ -253,36 +262,48 @@ function seed(){ return {
       ['nội dung','text'],
       ['telegram message id','bigint'],
       ['thời gian','datetime']
-    ], note:['chiều: in (khách gửi) · out (bot hoặc sales gửi)','mã nhân viên rỗng = tin do bot tự động gửi'] }
+    ], note:['chiều: in (khách gửi) · out (bot hoặc sales gửi)','mã nhân viên rỗng = tin do bot tự động gửi'] },
+    { name:'marketing_content', tone:'blue', x:255, y:695, w:220, fields:[
+      ['mã nội dung','uuid · PK'],
+      ['mã nhân viên','uuid · FK'],
+      ['loại nội dung','string'],
+      ['tiêu đề','string'],
+      ['nội dung','text'],
+      ['thời gian tạo','datetime']
+    ], note:[] }
   ],
   links:[
     { from:'showrooms', to:'employees', c:'#1a916c',
-      d:'M350,59 H147 Q137,59 137,69 V224' },
+      d:'M580,59 H377 Q367,59 367,69 V224' },
     { from:'showrooms', to:'customers', c:'#1a916c', anchor:'start',
-      d:'M455,102 V164' },
+      d:'M685,102 V164' },
     { from:'showrooms', to:'orders', c:'#1a916c', anchor:'start',
-      d:'M560,59 H660 Q670,59 670,69 V530 Q670,540 660,540 H545 Q535,540 535,550 V554' },
+      d:'M790,59 H890 Q900,59 900,69 V537.5 Q900,540 900,537.5 V536.3 Q900,535 898.8,535 H810 Q800,535 800,545 V584' },
     { from:'employees', to:'customers', c:'#2076b8',
-      d:'M255,313 H324' },
-    { from:'employees', to:'orders', c:'#2076b8',
-      d:'M137,397 V610 Q137,620 147,620 H324' },
+      d:'M485,313 H554' },
+    { from:'employees', to:'orders', c:'#2076b8', anchor:'start',
+      d:'M449.3,478 V605 Q449.3,615 459.3,615 H589' },
+    { from:'employees', to:'sessions', c:'#2076b8',
+      d:'M250,310 H216' },
     { from:'customers', to:'orders', c:'#2076b8', anchor:'start',
-      d:'M455,499 V554' },
+      d:'M685,499 V531.5 Q685,541.5 695,541.5 H710 Q720,541.5 720,551.5 V584' },
     { from:'models', to:'orders', c:'#5b45a6',
-      d:'M700,603 H584' },
+      d:'M930,603 H899.5 Q889.5,603 889.5,613 V623 Q889.5,633 879.5,633 H849' },
     { from:'orders', to:'contracts', c:'#c8922e', lbl:'1 – 1',
-      d:'M580,803 H694' },
+      d:'M845,833 H874.5 Q884.5,833 884.5,823 V813 Q884.5,803 894.5,803 H924' },
     { from:'customers', to:'telegram_messages', c:'#2b8fb5',
-      d:'M585,470 H981' },
+      d:'M815,470 H1025.5 Q1028,470 1028,472.5 V473.8 Q1028,475 1029.3,475 H1241' },
     { from:'employees', to:'telegram_messages', c:'#2b8fb5',
-      d:'M20,350 H16 Q6,350 6,360 V940 Q6,950 16,950 H950 Q970,950 970,930 V590 Q970,580 980,580 H981' }
+      d:'M250,350 H243 Q236,350 236,357 V940 Q236,950 246,950 H1197.5 Q1200,950 1202.5,950 H1203.8 Q1205,950 1205,948.8 V820 Q1205,810 1205,800 V610 Q1205,600 1215,600 H1239' },
+    { from:'employees', to:'marketing_content', c:'#a04a2a', anchor:'start',
+      d:'M366.3,478 V689' }
   ]
 };}
 
 /* ══════════════════════════════════════════════════════════════
    3. TRẠNG THÁI
    ══════════════════════════════════════════════════════════════ */
-const KEY = 'erd_editor_v2';
+const KEY = 'erd_editor_v3';
 let S = load();
 let sel = { kind:null, i:-1 };
 
